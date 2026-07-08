@@ -1,0 +1,130 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isSuperAdmin() {
+      return isSignedIn() && getUserData().role == 'super_admin';
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (getUserData().role == 'admin' || getUserData().role == 'super_admin');
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // --- Entity Validations ---
+    function isValidUser(data) {
+      return data.uid == request.auth.uid 
+        && data.keys().hasAll(['uid', 'email', 'role', 'createdAt'])
+        && data.uid is string
+        && data.email is string
+        && data.role in ['student', 'admin', 'super_admin'];
+    }
+
+    function isValidSubmission(data) {
+      return data.keys().hasAll(['id', 'studentId', 'exerciseId', 'exerciseTitle', 'text', 'status', 'createdAt', 'updatedAt'])
+        && data.studentId == request.auth.uid
+        && data.createdAt == request.time
+        && data.updatedAt == request.time
+        && data.text.size() <= 10000;
+    }
+
+    function isValidExercise(data) {
+      return data.keys().hasAll(['id', 'title', 'situation', 'content', 'type', 'createdAt'])
+        && data.keys().size() == 6
+        && data.id is string && data.id.size() <= 128
+        && data.title is string && data.title.size() <= 200
+        && data.situation is string && data.situation.size() <= 2000
+        && data.content is string && data.content.size() <= 5000
+        && data.type is string && data.type.size() <= 50
+        && data.createdAt == request.time;
+    }
+
+    function isValidProgress(data) {
+      return data.keys().hasAll(['exerciseId', 'text', 'updatedAt'])
+        && (data.keys().size() == 3 || (data.keys().size() == 4 && data.keys().hasAll(['evaluation'])))
+        && data.exerciseId is string && data.exerciseId.size() <= 128
+        && data.text is string && data.text.size() <= 10000
+        && data.updatedAt == request.time
+        && (!data.keys().hasAll(['evaluation']) || (
+          data.evaluation.score is number 
+          && data.evaluation.score >= 0 
+          && data.evaluation.score <= 45
+          && data.evaluation.inhalt is string && data.evaluation.inhalt.size() <= 2000
+          && data.evaluation.struktur is string && data.evaluation.struktur.size() <= 2000
+          && data.evaluation.sprache is string && data.evaluation.sprache.size() <= 2000
+          && data.evaluation.overallFeedback is string && data.evaluation.overallFeedback.size() <= 2000
+        ));
+    }
+
+    // --- Match Rules ---
+    match /exercises/{exerciseId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidExercise(incoming()) && isValidId(exerciseId);
+      allow update, delete: if isAdmin();
+    }
+
+    match /submissions/{submissionId} {
+      allow list, get: if isSignedIn() && (resource.data.studentId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && isValidSubmission(incoming());
+      allow update: if isAdmin()
+        && existing().status == 'soumis'
+        && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'correction', 'corrected_by_admin_id', 'updatedAt'])
+        && incoming().status == 'corrige'
+        && incoming().corrected_by_admin_id == request.auth.uid
+        && incoming().updatedAt == request.time;
+      allow delete: if isSuperAdmin();
+    }
+
+    match /users/{userId} {
+      allow list, get: if isSignedIn(); 
+      allow create: if isOwner(userId) && isValidUser(incoming()) && incoming().createdAt == request.time;
+      allow update: if isSuperAdmin() || (isOwner(userId) && (
+        !incoming().diff(existing()).affectedKeys().hasAny(['role']) ||
+        (request.auth.token.email == 'yombivictor@gmail.com' && incoming().role == 'super_admin')
+      ));
+      allow delete: if isSuperAdmin();
+
+      match /progress/{exerciseId} {
+        allow list, get: if isOwner(userId) || isSuperAdmin();
+        allow create: if isOwner(userId) && isValidProgress(incoming()) && isValidId(exerciseId);
+        allow update: if isOwner(userId) 
+          && incoming().exerciseId == existing().exerciseId
+          && isValidProgress(incoming())
+          && (
+            (incoming().diff(existing()).affectedKeys().hasOnly(['text', 'updatedAt'])) ||
+            (incoming().diff(existing()).affectedKeys().hasOnly(['evaluation', 'updatedAt'])) ||
+            (incoming().diff(existing()).affectedKeys().hasOnly(['text', 'evaluation', 'updatedAt']))
+          );
+        allow delete: if isSuperAdmin();
+      }
+    }
+  }
+}
