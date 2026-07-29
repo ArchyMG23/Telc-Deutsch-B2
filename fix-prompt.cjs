@@ -1,57 +1,31 @@
 const fs = require('fs');
 let code = fs.readFileSync('src/services/gemini.ts', 'utf-8');
 
-const target = `    1. Inhalt (Contenu) : /20 pts (Évalue si les 4 points de la consigne sont traités).
-    2. Kommunikative Gestaltung (Structure & communication) : /15 pts (Structure formelle, registre, éléments obligatoires).
-    3. Formale Richtigkeit (Correction linguistique) : /10 pts (Grammaire, orthographe, vocabulaire).
-    4. Feedback global et conseils.
-    5. Fournis UNE VERSION ENTIÈREMENT CORRIGÉE de la rédaction.
+const targetPrompt = `  const prompt = \`
+    Tu es un expert du test d'allemand Telc B2.
+    Analyse le document fourni et extrais uniquement les sujets d'expression écrite (Schreiben).
+    Ces sujets concernent généralement des lettres de réclamation (Beschwerdebrief), des demandes d'informations (Bitte um Informationen), ou des lettres de candidature (Bewerbung).
+    
+    Pour chaque exercice trouvé, fournis :
+    - Un titre clair (ex: "Beschwerdebrief: Sprachreise")
+    - La situation ou l'offre intégrale (le texte de base, l'annonce, ou le contexte de la lettre).
+    - Le contenu de la consigne (les points spécifiques à traiter dans la lettre).
+    - Le type de lettre (ex: "Beschwerde", "Information", "Bewerbung").
+  \`;`;
 
-    IMPORTANT: Retourne UNIQUEMENT un objet JSON valide correspondant au schéma demandé.
-\`;
+const newPrompt = `  const prompt = \`
+    Tu es un expert du test d'allemand Telc B2.
+    Analyse le document fourni et extrais uniquement les sujets d'expression écrite (Schreiben).
+    Ces sujets concernent généralement des lettres de réclamation (Beschwerdebrief), des demandes d'informations (Bitte um Informationen), ou des lettres de candidature (Bewerbung).
+    
+    IMPORTANT : Ne résume PAS et ne simplifie PAS le texte. Tu DOIS extraire les textes EXACTS tels qu'ils apparaissent dans le document original, mot pour mot.
+    
+    Pour chaque exercice trouvé, fournis :
+    - Un titre clair (ex: "Beschwerdebrief: Sprachreise")
+    - La situation ou l'offre intégrale : Recopie EXACTEMENT tout le texte de base, l'annonce ou le contexte de la lettre. N'omets aucun détail, adresse ou information.
+    - Le contenu de la consigne : Recopie EXACTEMENT la consigne complète et les 4 points spécifiques à traiter dans la lettre.
+    - Le type de lettre (ex: "Beschwerde", "Information", "Bewerbung").
+  \`;`;
 
-  try {
-    const response = await getAiClient().models.generateContent({
-      model: 'gemini-3.1-pro-preview',
-      contents: [{ parts: [{ text: prompt }] }],
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            score: { type: Type.NUMBER, description: "Note globale sur 45" },
-            inhalt: { type: Type.STRING, description: "Feedback détaillé contenu (Inhalt)" },
-            inhaltScore: { type: Type.NUMBER, description: "Note contenu /20" },
-            struktur: { type: Type.STRING, description: "Feedback détaillé structure (Kommunikative Gestaltung)" },
-            strukturScore: { type: Type.NUMBER, description: "Note structure /15" },
-            sprache: { type: Type.STRING, description: "Feedback détaillé langue (Formale Richtigkeit)" },
-            spracheScore: { type: Type.NUMBER, description: "Note langue /10" },`;
-
-const replacement = `    1. Aufgabenbewältigung (Inhalt) : /15 pts (Max 5 points x multiplier 3). Évalue si les points de la consigne sont traités.
-    2. Kommunikative Gestaltung (Structure & communication) : /15 pts (Max 5 points x multiplier 3). Structure formelle, registre, éléments obligatoires, cohérence.
-    3. Korrektheit (Correction linguistique) : /15 pts (Max 5 points x multiplier 3). Grammaire, orthographe, vocabulaire.
-    4. Feedback global et conseils.
-    5. Fournis UNE VERSION ENTIÈREMENT CORRIGÉE de la rédaction.
-
-    IMPORTANT: Retourne UNIQUEMENT un objet JSON valide correspondant au schéma demandé.
-\`;
-
-  try {
-    const response = await getAiClient().models.generateContent({
-      model: 'gemini-3.1-pro-preview',
-      contents: [{ parts: [{ text: prompt }] }],
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            score: { type: Type.NUMBER, description: "Note globale sur 45" },
-            inhalt: { type: Type.STRING, description: "Feedback détaillé Aufgabenbewältigung" },
-            inhaltScore: { type: Type.NUMBER, description: "Note Inhalt /15" },
-            struktur: { type: Type.STRING, description: "Feedback détaillé Kommunikative Gestaltung" },
-            strukturScore: { type: Type.NUMBER, description: "Note Struktur /15" },
-            sprache: { type: Type.STRING, description: "Feedback détaillé Korrektheit" },
-            spracheScore: { type: Type.NUMBER, description: "Note Sprache /15" },`;
-
-code = code.replace(target, replacement);
+code = code.replace(targetPrompt, newPrompt);
 fs.writeFileSync('src/services/gemini.ts', code);

@@ -513,7 +513,7 @@ function App() {
       alert(`${newExercises.length} sujet(s) extrait(s) avec succès.`);
     } catch (error) {
       console.error(error);
-      alert("Erreur lors de l'extraction des sujets.");
+      alert("Erreur lors de l'extraction: " + (error instanceof Error ? error.message : "Erreur inconnue"));
     } finally {
       setIsExtracting(false);
     }

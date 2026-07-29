@@ -39,74 +39,56 @@ export async function extractExercises(fileData: string, mimeType: string): Prom
     Analyse le document fourni et extrais uniquement les sujets d'expression écrite (Schreiben).
     Ces sujets concernent généralement des lettres de réclamation (Beschwerdebrief), des demandes d'informations (Bitte um Informationen), ou des lettres de candidature (Bewerbung).
     
-    IMPORTANT : Ne résume PAS et ne simplifie PAS le texte. Tu DOIS extraire les textes EXACTS tels qu'ils apparaissent dans le document original, mot pour mot.
-    
     Pour chaque exercice trouvé, fournis :
     - Un titre clair (ex: "Beschwerdebrief: Sprachreise")
-    - La situation ou l'offre intégrale : Recopie EXACTEMENT tout le texte de base, l'annonce ou le contexte de la lettre. N'omets aucun détail, adresse ou information.
-    - Le contenu de la consigne : Recopie EXACTEMENT la consigne complète et les 4 points spécifiques à traiter dans la lettre.
+    - La situation ou l'offre intégrale (le texte de base, l'annonce, ou le contexte de la lettre).
+    - Le contenu de la consigne (les points spécifiques à traiter dans la lettre).
     - Le type de lettre (ex: "Beschwerde", "Information", "Bewerbung").
   `;
 
-  try {
-    const response = await getAiClient().models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: {
-        parts: [
-          {
-            inlineData: {
-              data: fileData,
-              mimeType: mimeType,
-            },
-          },
-          { text: prompt },
-        ],
-      },
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              id: { type: Type.STRING, description: "Un identifiant unique (ex: ex-1)" },
-              title: { type: Type.STRING, description: "Titre de l'exercice" },
-              situation: { type: Type.STRING, description: "La situation de base ou l'offre intégrale" },
-              content: { type: Type.STRING, description: "Consigne complète de l'exercice et points à traiter" },
-              type: { type: Type.STRING, description: "Type de lettre" },
-            },
-            required: ["id", "title", "situation", "content", "type"],
+  const response = await getAiClient().models.generateContent({
+    model: 'gemini-3.1-pro-preview',
+    contents: {
+      parts: [
+        {
+          inlineData: {
+            data: fileData,
+            mimeType: mimeType,
           },
         },
+        { text: prompt },
+      ],
+    },
+    config: {
+      responseMimeType: 'application/json',
+      responseSchema: {
+        type: Type.ARRAY,
+        items: {
+          type: Type.OBJECT,
+          properties: {
+            id: { type: Type.STRING, description: "Un identifiant unique (ex: ex-1)" },
+            title: { type: Type.STRING, description: "Titre de l'exercice" },
+            situation: { type: Type.STRING, description: "La situation de base ou l'offre intégrale" },
+            content: { type: Type.STRING, description: "Consigne complète de l'exercice et points à traiter" },
+            type: { type: Type.STRING, description: "Type de lettre" },
+          },
+          required: ["id", "title", "situation", "content", "type"],
+        },
       },
-    });
+    },
+  });
 
+  try {
     let rawText = response.text || '[]';
-    
     // Remove markdown json block if present
     if (rawText.includes('```json')) {
       rawText = rawText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
     } else if (rawText.includes('```')) {
       rawText = rawText.replace(/```\n?/g, '').trim();
     }
-    
     return JSON.parse(rawText);
   } catch (e: any) {
-    console.error("Failed to extract exercises:", e);
-    
-    if (e.message?.includes("429") || e.message?.includes("quota")) {
-      throw new Error("Limite de requêtes atteinte (Quota exceeded). Veuillez réessayer dans une minute.");
-    }
-    if (e.message?.includes("API key not valid")) {
-      throw new Error("La clé API configurée est invalide. Vérifiez vos variables d'environnement.");
-    }
-    if (e.message?.includes("safety") || e.message?.includes("blocked")) {
-      throw new Error("Le document a été bloqué par les filtres de sécurité de l'IA.");
-    }
-    if (e.message?.includes("inlineData")) {
-       throw new Error("Le format du fichier n'est pas supporté ou est trop volumineux pour l'IA.");
-    }
-    
+    console.error("Failed to extract exercises", e);
     throw new Error(e.message || "Erreur lors de l'extraction des sujets.");
   }
 }
@@ -118,17 +100,17 @@ export async function evaluateWriting(exercise: Exercise, userText: string): Pro
     
     Situation / Offre :
     """
-    ${exercise.situation}
+    \${exercise.situation}
     """
     
     Consigne de l'exercice :
     """
-    ${exercise.content}
+    \${exercise.content}
     """
     
     Rédaction de l'étudiant :
     """
-    ${userText}
+    \${userText}
     """
     
     Fournis une évaluation détaillée en français, structurée selon les critères du Telc B2 :
@@ -137,13 +119,12 @@ export async function evaluateWriting(exercise: Exercise, userText: string): Pro
     3. Korrektheit (Correction linguistique) : /15 pts (Max 5 points x multiplier 3). Grammaire, orthographe, vocabulaire.
     4. Feedback global et conseils.
     5. Fournis UNE VERSION ENTIÈREMENT CORRIGÉE de la rédaction.
-
     IMPORTANT: Retourne UNIQUEMENT un objet JSON valide correspondant au schéma demandé.
 `;
 
   try {
     const response = await getAiClient().models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.1-pro-preview',
       contents: [{ parts: [{ text: prompt }] }],
       config: {
         responseMimeType: 'application/json',
