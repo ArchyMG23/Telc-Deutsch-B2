@@ -47,7 +47,7 @@ export async function extractExercises(fileData: string, mimeType: string): Prom
   `;
 
   const response = await getAiClient().models.generateContent({
-    model: 'gemini-3-flash-preview',
+    model: 'gemini-3.1-pro-preview',
     contents: {
       parts: [
         {
@@ -79,10 +79,17 @@ export async function extractExercises(fileData: string, mimeType: string): Prom
   });
 
   try {
-    return JSON.parse(response.text || '[]');
-  } catch (e) {
-    console.error("Failed to parse exercises", e);
-    return [];
+    let rawText = response.text || '[]';
+    // Remove markdown json block if present
+    if (rawText.includes('```json')) {
+      rawText = rawText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    } else if (rawText.includes('```')) {
+      rawText = rawText.replace(/```\n?/g, '').trim();
+    }
+    return JSON.parse(rawText);
+  } catch (e: any) {
+    console.error("Failed to extract exercises", e);
+    throw new Error(e.message || "Erreur lors de l'extraction des sujets.");
   }
 }
 

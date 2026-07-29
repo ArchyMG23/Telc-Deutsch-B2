@@ -89,27 +89,44 @@ export const loginWithGoogle = async () => {
 };
 
 export const loginWithEmail = async (email: string, password: string) => {
-  const result = await signInWithEmailAndPassword(auth, email, password);
-  return result.user;
+  try {
+    const result = await signInWithEmailAndPassword(auth, email, password);
+    return result.user;
+  } catch (error: any) {
+    if (error.code === 'auth/operation-not-allowed') {
+      throw new Error("L'authentification par email et mot de passe n'est pas activée dans la console Firebase.");
+    }
+    throw error;
+  }
 };
 
 export const signUpWithEmail = async (email: string, password: string, fullName: string, role: UserRole = 'student') => {
-  const result = await createUserWithEmailAndPassword(auth, email, password);
-  const user = result.user;
-  
-  await updateProfile(user, { displayName: fullName });
-  
-  const userRef = doc(db, 'users', user.uid);
-  await setDoc(userRef, {
-    uid: user.uid,
-    email: user.email,
-    displayName: fullName,
-    photoURL: null,
-    role: email === 'yombivictor@gmail.com' ? 'super_admin' : role,
-    createdAt: serverTimestamp()
-  });
-  
-  return user;
+  try {
+    const result = await createUserWithEmailAndPassword(auth, email, password);
+    const user = result.user;
+    
+    await updateProfile(user, { displayName: fullName });
+    
+    const userRef = doc(db, 'users', user.uid);
+    await setDoc(userRef, {
+      uid: user.uid,
+      email: user.email,
+      displayName: fullName,
+      photoURL: null,
+      role: email === 'yombivictor@gmail.com' ? 'super_admin' : role,
+      createdAt: serverTimestamp()
+    });
+    
+    return user;
+  } catch (error: any) {
+    if (error.code === 'auth/operation-not-allowed') {
+      throw new Error("L'inscription par email n'est pas activée. Veuillez l'activer dans la console Firebase (Authentication > Sign-in method).");
+    }
+    if (error.code === 'auth/email-already-in-use') {
+      throw new Error("Cette adresse email est déjà utilisée.");
+    }
+    throw error;
+  }
 };
 
 export const updateUserRole = async (userId: string, role: UserRole) => {
