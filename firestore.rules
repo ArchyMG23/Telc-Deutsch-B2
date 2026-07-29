@@ -61,10 +61,10 @@ service cloud.firestore {
         && data.keys().size() == 6
         && data.id is string && data.id.size() <= 128
         && data.title is string && data.title.size() <= 200
-        && data.situation is string && data.situation.size() <= 2000
-        && data.content is string && data.content.size() <= 5000
+        && data.situation is string && data.situation.size() <= 10000
+        && data.content is string && data.content.size() <= 10000
         && data.type is string && data.type.size() <= 50
-        && data.createdAt == request.time;
+        && (data.createdAt == request.time || data.createdAt is string);
     }
 
     function isValidProgress(data) {
