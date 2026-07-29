@@ -81,6 +81,9 @@ export const loginWithGoogle = async () => {
       alert("Ce site n'est pas autorisé pour la connexion Google. Utilisez l'email.");
       return null;
     }
+    if (error.code === 'auth/popup-blocked') {
+      throw new Error("La fenêtre de connexion a été bloquée. Veuillez ouvrir l'application dans un nouvel onglet (icône en haut à droite) ou utiliser la connexion par email.");
+    }
     throw error;
   }
 };
