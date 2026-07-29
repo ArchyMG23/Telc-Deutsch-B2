@@ -309,15 +309,11 @@ function App() {
       const parsed = JSON.parse(saved);
       if (parsed.length > 0) {
         const combined = [...parsed];
-        DEFAULT_EXERCISES.forEach(def => {
-          if (!combined.some(c => c.id === def.id)) {
-            combined.push(def);
-          }
-        });
+
         return combined;
       }
     }
-    return DEFAULT_EXERCISES;
+    return [];
   });
 
   const [progress, setProgress] = useState<Record<string, SavedProgress>>(() => {
@@ -387,11 +383,7 @@ function App() {
       
       setExercises(prev => {
         const combined = [...firestoreExercises];
-        DEFAULT_EXERCISES.forEach(def => {
-          if (!combined.some(c => c.id === def.id)) {
-            combined.push(def);
-          }
-        });
+
         localStorage.setItem('dia_exercises', JSON.stringify(combined));
         return combined;
       });
