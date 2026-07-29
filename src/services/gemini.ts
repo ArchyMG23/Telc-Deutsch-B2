@@ -39,12 +39,15 @@ export async function extractExercises(fileData: string, mimeType: string): Prom
     Analyse le document fourni et extrais uniquement les sujets d'expression écrite (Schreiben).
     Ces sujets concernent généralement des lettres de réclamation (Beschwerdebrief), des demandes d'informations (Bitte um Informationen), ou des lettres de candidature (Bewerbung).
     
-    IMPORTANT : Ne résume PAS et ne simplifie PAS le texte. Tu DOIS extraire les textes EXACTS tels qu'ils apparaissent dans le document original, mot pour mot.
+    RÈGLES D'EXTRACTION TRÈS STRICTES :
+    1. Ne résume PAS et ne simplifie PAS le texte.
+    2. SÉPARE CLAIREMENT "La situation ou l'offre" de "La consigne".
     
     Pour chaque exercice trouvé, fournis :
     - Un titre clair (ex: "Beschwerdebrief: Sprachreise")
-    - La situation ou l'offre intégrale : Recopie EXACTEMENT tout le texte de base, l'annonce ou le contexte de la lettre. N'omets aucun détail, adresse ou information.
-    - Le contenu de la consigne : Recopie EXACTEMENT la consigne complète et les 4 points spécifiques à traiter dans la lettre.
+    - La situation ou l'offre intégrale : Recopie EXACTEMENT tout le texte de base (l'annonce, la publicité, l'article ou le contexte). 
+      INCLUS OBLIGATOIREMENT toutes les informations de contact : nom de l'entreprise, adresses postales, numéros de téléphone, e-mails, sites web, et dates. Ne laisse rien de côté.
+    - Le contenu de la consigne : Recopie EXACTEMENT et UNIQUEMENT les instructions (ex: "Schreiben Sie eine Beschwerde...") et les 4 puces/points spécifiques que l'étudiant doit traiter dans sa lettre.
     - Le type de lettre (ex: "Beschwerde", "Information", "Bewerbung").
   `;
 
@@ -71,8 +74,8 @@ export async function extractExercises(fileData: string, mimeType: string): Prom
             properties: {
               id: { type: Type.STRING, description: "Un identifiant unique (ex: ex-1)" },
               title: { type: Type.STRING, description: "Titre de l'exercice" },
-              situation: { type: Type.STRING, description: "La situation de base ou l'offre intégrale" },
-              content: { type: Type.STRING, description: "Consigne complète de l'exercice et points à traiter" },
+              situation: { type: Type.STRING, description: "La situation de base, l'annonce ou l'offre intégrale AVEC toutes les coordonnées, adresses et dates." },
+              content: { type: Type.STRING, description: "Uniquement les instructions et les 4 points à traiter, sans inclure la situation de base." },
               type: { type: Type.STRING, description: "Type de lettre" },
             },
             required: ["id", "title", "situation", "content", "type"],

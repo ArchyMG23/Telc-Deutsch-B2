@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { collection, query, getDocs, updateDoc, doc, setDoc } from 'firebase/firestore';
 import { db, createAdminAccount, resetUsersData, resetExercises } from '../lib/firebase';
 import { UserProfile, UserRole } from '../types';
-import { Users, BookOpen, Settings, Trash2 , Plus, X} from 'lucide-react';
+import { Users, BookOpen, Settings, Trash2 , Plus, X, Eye} from 'lucide-react';
 import { Exercise } from '../services/gemini';
 import { UploadSection } from './UploadSection';
 
@@ -24,6 +24,7 @@ export function AdminDashboard({ exercises, onUpload, isExtracting, isOnline, de
   const [isCreatingAdmin, setIsCreatingAdmin] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+  const [previewExerciseId, setPreviewExerciseId] = useState<string | null>(null);
 
   useEffect(() => {
     loadUsers();
@@ -224,21 +225,46 @@ export function AdminDashboard({ exercises, onUpload, isExtracting, isOnline, de
                     <th className="p-4 font-medium text-gray-600 dark:text-gray-300 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+                                <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
                   {exercises.map(ex => (
-                    <tr key={ex.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                      <td className="p-4 font-semibold">{ex.title}</td>
-                      <td className="p-4 text-gray-500">{ex.type}</td>
-                      <td className="p-4 text-right">
-                        <button onClick={() => {
-                          if (confirm("Supprimer cet exercice ?")) {
-                            deleteExercise(ex.id);
-                          }
-                        }} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </td>
-                    </tr>
+                    <React.Fragment key={ex.id}>
+                      <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                        <td className="p-4 font-semibold">{ex.title}</td>
+                        <td className="p-4 text-gray-500">{ex.type}</td>
+                        <td className="p-4 text-right flex justify-end gap-2">
+                          <button onClick={() => setPreviewExerciseId(previewExerciseId === ex.id ? null : ex.id)} className="p-2 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => {
+                            if (confirm("Supprimer cet exercice ?")) {
+                              deleteExercise(ex.id);
+                            }
+                          }} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </tr>
+                      {previewExerciseId === ex.id && (
+                        <tr className="bg-gray-50 dark:bg-gray-800/30">
+                          <td colSpan={3} className="p-6">
+                            <div className="space-y-4">
+                              <div>
+                                <h4 className="font-bold text-xs uppercase text-gray-500 mb-1">Situation / Offre</h4>
+                                <div className="p-3 bg-white dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700 whitespace-pre-wrap text-sm">
+                                  {ex.situation}
+                                </div>
+                              </div>
+                              <div>
+                                <h4 className="font-bold text-xs uppercase text-gray-500 mb-1">Consigne</h4>
+                                <div className="p-3 bg-white dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700 whitespace-pre-wrap text-sm">
+                                  {ex.content}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
                   ))}
                 </tbody>
              </table>
