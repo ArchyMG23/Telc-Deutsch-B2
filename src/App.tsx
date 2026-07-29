@@ -376,6 +376,32 @@ function App() {
     }
   };
 
+  // Sync Exercises from Firestore
+  useEffect(() => {
+    const q = query(collection(db, 'exercises'));
+    const unsubscribe = onSnapshot(q, (snap) => {
+      const firestoreExercises: Exercise[] = [];
+      snap.forEach(doc => {
+        firestoreExercises.push(doc.data() as Exercise);
+      });
+      
+      setExercises(prev => {
+        const combined = [...firestoreExercises];
+        DEFAULT_EXERCISES.forEach(def => {
+          if (!combined.some(c => c.id === def.id)) {
+            combined.push(def);
+          }
+        });
+        localStorage.setItem('dia_exercises', JSON.stringify(combined));
+        return combined;
+      });
+    }, (error) => {
+      console.error("Error fetching exercises:", error);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   // Sync Auth & Profile
   useEffect(() => {
     let unsubscribeProfile: (() => void) | null = null;
