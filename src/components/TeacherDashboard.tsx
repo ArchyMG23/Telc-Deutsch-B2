@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { collection, query, where, onSnapshot, doc, updateDoc, serverTimestamp, orderBy } from 'firebase/firestore';
 import { db, auth, Submission } from '../lib/firebase';
-import { CheckCircle, Clock, AlertCircle, Send, Highlighter, GraduationCap, ArrowLeft } from 'lucide-react';
+import { CheckCircle, Clock, AlertCircle, Send, Highlighter, GraduationCap, ArrowLeft, FileText, Eye, User as UserIcon } from 'lucide-react';
 import Markdown from 'react-markdown';
 
 export function TeacherDashboard() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [selectedSub, setSelectedSub] = useState<Submission | null>(null);
+  const [exerciseDetails, setExerciseDetails] = useState<any>(null);
+  const [showExercise, setShowExercise] = useState(false);
   const [correctionData, setCorrectionData] = useState({
     inhaltScore: 0,
     strukturScore: 0,
@@ -130,6 +132,21 @@ export function TeacherDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Student Text Area with Highlight editing */}
               <div className="space-y-4">
+                {showExercise && exerciseDetails && (
+                  <div className="mb-6 p-5 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-800 space-y-4">
+                    <div className="flex items-center gap-2 mb-2 text-[#FF0000] font-bold">
+                      <FileText className="w-4 h-4" /> Rappel du Sujet
+                    </div>
+                    <div>
+                      <h4 className="text-xs uppercase text-gray-500 font-bold mb-1">Situation / Offre</h4>
+                      <p className="text-base text-gray-800 dark:text-gray-200 whitespace-pre-wrap leading-relaxed">{exerciseDetails.situation}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-xs uppercase text-gray-500 font-bold mb-1">Consigne</h4>
+                      <p className="text-base text-gray-800 dark:text-gray-200 whitespace-pre-wrap leading-relaxed">{exerciseDetails.content}</p>
+                    </div>
+                  </div>
+                )}
                 <div className="flex items-center justify-between">
                   <label className="block text-sm font-bold uppercase tracking-wider text-gray-400">Texte de l'étudiant / Zone de correction</label>
                   {selectedSub.status !== 'corrige' && (
