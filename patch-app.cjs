@@ -1,28 +1,47 @@
 const fs = require('fs');
 let code = fs.readFileSync('src/App.tsx', 'utf-8');
 
-const target = `        if (isOnline) {
-          await setDoc(doc(db, "exercises", newEx.id), newEx);
-        }`;
+const target1 = `            <SuperAdminDashboardView 
+              exercises={exercises} 
+              onUpload={handleUpload}
+              isExtracting={isExtracting}
+              isOnline={isOnline}
+              deleteExercise={async (id) => {
+                await deleteDoc(doc(db, "exercises", id));
+              }}
+            />`;
 
-const replacement = `        if (isOnline) {
-          // Strictly map to 6 properties to ensure firestore rules validate
-          const firestorePayload = {
-            id: newEx.id,
-            title: newEx.title || 'Sans titre',
-            situation: newEx.situation || '',
-            content: newEx.content || '',
-            type: newEx.type || 'Inconnu',
-            createdAt: newEx.createdAt
-          };
-          console.log("Saving to Firestore:", firestorePayload);
-          await setDoc(doc(db, "exercises", newEx.id), firestorePayload);
-        }`;
+const replacement1 = `            <SuperAdminDashboardView 
+              exercises={exercises} 
+              onUpload={handleUpload}
+              isExtracting={isExtracting}
+              isOnline={isOnline}
+              deleteExercise={async (id) => {
+                await deleteDoc(doc(db, "exercises", id));
+              }}
+              onSelectExercise={selectExercise}
+            />`;
 
-if (code.includes(target)) {
-  code = code.replace(target, replacement);
-  fs.writeFileSync('src/App.tsx', code);
-  console.log("App.tsx patched.");
-} else {
-  console.log("Target not found.");
-}
+code = code.replace(target1, replacement1);
+
+// We should also pass it to AdminDashboardView if they want it for standard admin!
+const target2 = `          ) : userProfile?.role === 'admin' && !isUploading && !selectedExercise ? (
+            <AdminDashboardView />
+          ) : isUploading ? (`;
+
+const replacement2 = `          ) : userProfile?.role === 'admin' && !isUploading && !selectedExercise ? (
+            <AdminDashboardView 
+              exercises={exercises} 
+              onUpload={handleUpload}
+              isExtracting={isExtracting}
+              isOnline={isOnline}
+              deleteExercise={async (id) => {
+                await deleteDoc(doc(db, "exercises", id));
+              }}
+              onSelectExercise={selectExercise}
+            />
+          ) : isUploading ? (`;
+
+code = code.replace(target2, replacement2);
+
+fs.writeFileSync('src/App.tsx', code);

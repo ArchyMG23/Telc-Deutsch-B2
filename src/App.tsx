@@ -657,6 +657,7 @@ function App() {
               deleteExercise={async (id) => {
                 await deleteDoc(doc(db, "exercises", id));
               }}
+              onSelectExercise={selectExercise}
             />
           ) : userProfile?.role === 'admin' && !isUploading && !selectedExercise ? (
             <AdminDashboardView />

@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { collection, query, getDocs, updateDoc, doc, setDoc } from 'firebase/firestore';
 import { db, createAdminAccount, resetUsersData, resetExercises } from '../lib/firebase';
 import { UserProfile, UserRole } from '../types';
-import { Users, BookOpen, Settings, Trash2 , Plus, X, Eye} from 'lucide-react';
+import { Users, BookOpen, Settings, Trash2 , Plus, X, Eye, GraduationCap, PenTool} from 'lucide-react';
 import { Exercise } from '../services/gemini';
 import { UploadSection } from './UploadSection';
+import { TeacherDashboard } from './TeacherDashboard';
 
 interface AdminDashboardProps {
   exercises: Exercise[];
@@ -12,12 +13,13 @@ interface AdminDashboardProps {
   isExtracting: boolean;
   isOnline: boolean;
   deleteExercise: (id: string) => Promise<void>;
+  onSelectExercise?: (id: string) => void;
 }
 
-export function AdminDashboard({ exercises, onUpload, isExtracting, isOnline, deleteExercise }: AdminDashboardProps) {
+export function AdminDashboard({ exercises, onUpload, isExtracting, isOnline, deleteExercise, onSelectExercise }: AdminDashboardProps) {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'users' | 'exercises' | 'rules'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'exercises' | 'rules' | 'corrections'>('users');
   const [newAdminEmail, setNewAdminEmail] = useState('');
   const [newAdminPassword, setNewAdminPassword] = useState('');
   const [newAdminName, setNewAdminName] = useState('');
@@ -116,6 +118,12 @@ export function AdminDashboard({ exercises, onUpload, isExtracting, isOnline, de
           className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === 'rules' ? 'bg-[#FF0000] text-white' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
         >
           <Settings className="w-5 h-5" /> Grilles d'évaluation
+        </button>
+        <button 
+          onClick={() => setActiveTab('corrections')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === 'corrections' ? 'bg-[#FF0000] text-white' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+        >
+          <GraduationCap className="w-5 h-5" /> Corrections
         </button>
       </div>
 
@@ -240,6 +248,14 @@ export function AdminDashboard({ exercises, onUpload, isExtracting, isOnline, de
                       </td>
                       <td className="p-4 text-gray-500">{ex.type}</td>
                       <td className="p-4 text-right flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                        {onSelectExercise && (
+                          <button onClick={(e) => {
+                            e.stopPropagation();
+                            onSelectExercise(ex.id);
+                          }} className="p-2 text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg" title="Traiter l'exercice">
+                            <PenTool className="w-4 h-4" />
+                          </button>
+                        )}
                         <button onClick={(e) => {
                           e.stopPropagation();
                           if (confirm("Supprimer cet exercice ?")) {
@@ -285,6 +301,12 @@ export function AdminDashboard({ exercises, onUpload, isExtracting, isOnline, de
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {activeTab === 'corrections' && (
+        <div className="h-full">
+          <TeacherDashboard />
         </div>
       )}
 
