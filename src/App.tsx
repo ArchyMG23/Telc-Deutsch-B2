@@ -298,22 +298,40 @@ const DEFAULT_EXERCISES: Exercise[] = [
   }
 ];
 
+const getDeletedIds = (): Set<string> => {
+  try {
+    const saved = localStorage.getItem('dia_deleted_exercises');
+    return new Set(saved ? JSON.parse(saved) : []);
+  } catch {
+    return new Set();
+  }
+};
+
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [teachers, setTeachers] = useState<any[]>([]);
   const [exercises, setExercises] = useState<Exercise[]>(() => {
+    const deletedIds = getDeletedIds();
     const saved = localStorage.getItem('dia_exercises');
     if (saved) {
-      const parsed = JSON.parse(saved);
-      if (parsed.length > 0) {
-        const combined = [...parsed];
-
-        return combined;
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const existingIds = new Set(parsed.map((e: Exercise) => e.id));
+          const missingDefaults = DEFAULT_EXERCISES.filter(e => !existingIds.has(e.id) && !deletedIds.has(e.id));
+          const combined = [...parsed, ...missingDefaults];
+          localStorage.setItem('dia_exercises', JSON.stringify(combined));
+          return combined;
+        }
+      } catch (e) {
+        console.error("Error reading saved exercises:", e);
       }
     }
-    return [];
+    const initialDefaults = DEFAULT_EXERCISES.filter(e => !deletedIds.has(e.id));
+    localStorage.setItem('dia_exercises', JSON.stringify(initialDefaults));
+    return initialDefaults;
   });
 
   const [progress, setProgress] = useState<Record<string, SavedProgress>>(() => {
@@ -381,14 +399,33 @@ function App() {
         firestoreExercises.push(doc.data() as Exercise);
       });
       
-      setExercises(prev => {
-        const combined = [...firestoreExercises];
+      const deletedIds = getDeletedIds();
+      setExercises(() => {
+        const fsIds = new Set(firestoreExercises.map(e => e.id));
+        const missingDefaults = DEFAULT_EXERCISES.filter(e => !fsIds.has(e.id) && !deletedIds.has(e.id));
+        const combined = [...firestoreExercises, ...missingDefaults];
 
         localStorage.setItem('dia_exercises', JSON.stringify(combined));
         return combined;
       });
     }, (error) => {
       console.error("Error fetching exercises:", error);
+      const saved = localStorage.getItem('dia_exercises');
+      const deletedIds = getDeletedIds();
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const existingIds = new Set(parsed.map((e: Exercise) => e.id));
+            const missingDefaults = DEFAULT_EXERCISES.filter(e => !existingIds.has(e.id) && !deletedIds.has(e.id));
+            setExercises([...parsed, ...missingDefaults]);
+            return;
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+      setExercises(DEFAULT_EXERCISES.filter(e => !deletedIds.has(e.id)));
     });
 
     return () => unsubscribe();
@@ -598,6 +635,29 @@ function App() {
     }
   };
 
+  const deleteExercise = async (id: string) => {
+    if (isOnline) {
+      try {
+        await deleteDoc(doc(db, "exercises", id));
+      } catch (e) {
+        console.error("Error deleting exercise from Firestore:", e);
+      }
+    }
+    try {
+      const deleted = JSON.parse(localStorage.getItem('dia_deleted_exercises') || '[]');
+      if (!deleted.includes(id)) {
+        localStorage.setItem('dia_deleted_exercises', JSON.stringify([...deleted, id]));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    setExercises(prev => {
+      const updated = prev.filter(e => e.id !== id);
+      localStorage.setItem('dia_exercises', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
   const sortedExercises = exercises.sort((a, b) => a.title.localeCompare(b.title));
   const filteredExercises = sortedExercises.filter(ex => 
     ex.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -654,9 +714,7 @@ function App() {
               onUpload={handleUpload}
               isExtracting={isExtracting}
               isOnline={isOnline}
-              deleteExercise={async (id) => {
-                await deleteDoc(doc(db, "exercises", id));
-              }}
+              deleteExercise={deleteExercise}
               onSelectExercise={selectExercise}
             />
           ) : userProfile?.role === 'admin' && !isUploading && !selectedExercise ? (
@@ -884,7 +942,7 @@ function App() {
                           onClick={(e) => {
                             e.stopPropagation();
                             if (confirm("Supprimer cet exercice pour tout le monde ?")) {
-                              deleteDoc(doc(db, "exercises", ex.id));
+                              deleteExercise(ex.id);
                             }
                           }}
                           className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 p-1.5 bg-white dark:bg-gray-800 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 transition-all"
