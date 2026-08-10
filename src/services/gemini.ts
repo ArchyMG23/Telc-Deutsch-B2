@@ -19,6 +19,7 @@ export interface Exercise {
   situation: string;
   content: string;
   type: string;
+  createdAt?: string;
 }
 
 export interface Evaluation {

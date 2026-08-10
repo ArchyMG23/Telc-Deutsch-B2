@@ -51,8 +51,8 @@ service cloud.firestore {
     function isValidSubmission(data) {
       return data.keys().hasAll(['id', 'studentId', 'exerciseId', 'exerciseTitle', 'text', 'status', 'createdAt', 'updatedAt'])
         && data.studentId == request.auth.uid
-        && data.createdAt == request.time
-        && data.updatedAt == request.time
+        && (data.createdAt == request.time || data.createdAt is timestamp || data.createdAt is string)
+        && (data.updatedAt == request.time || data.updatedAt is timestamp || data.updatedAt is string)
         && data.text.size() <= 10000;
     }
 
@@ -72,7 +72,7 @@ service cloud.firestore {
         && (data.keys().size() == 3 || (data.keys().size() == 4 && data.keys().hasAll(['evaluation'])))
         && data.exerciseId is string && data.exerciseId.size() <= 128
         && data.text is string && data.text.size() <= 10000
-        && data.updatedAt == request.time
+        && (data.updatedAt == request.time || data.updatedAt is timestamp)
         && (!data.keys().hasAll(['evaluation']) || (
           data.evaluation.score is number 
           && data.evaluation.score >= 0 
@@ -94,12 +94,7 @@ service cloud.firestore {
     match /submissions/{submissionId} {
       allow list, get: if isSignedIn() && (resource.data.studentId == request.auth.uid || isAdmin());
       allow create: if isSignedIn() && isValidSubmission(incoming());
-      allow update: if isAdmin()
-        && existing().status == 'soumis'
-        && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'correction', 'corrected_by_admin_id', 'updatedAt'])
-        && incoming().status == 'corrige'
-        && incoming().corrected_by_admin_id == request.auth.uid
-        && incoming().updatedAt == request.time;
+      allow update: if isAdmin();
       allow delete: if isSuperAdmin();
     }
 
@@ -114,15 +109,7 @@ service cloud.firestore {
 
       match /progress/{exerciseId} {
         allow list, get: if isOwner(userId) || isSuperAdmin();
-        allow create: if isOwner(userId) && isValidProgress(incoming()) && isValidId(exerciseId);
-        allow update: if isOwner(userId) 
-          && incoming().exerciseId == existing().exerciseId
-          && isValidProgress(incoming())
-          && (
-            (incoming().diff(existing()).affectedKeys().hasOnly(['text', 'updatedAt'])) ||
-            (incoming().diff(existing()).affectedKeys().hasOnly(['evaluation', 'updatedAt'])) ||
-            (incoming().diff(existing()).affectedKeys().hasOnly(['text', 'evaluation', 'updatedAt']))
-          );
+        allow create, update: if isOwner(userId) && isValidProgress(incoming()) && isValidId(exerciseId);
         allow delete: if isSuperAdmin();
       }
     }

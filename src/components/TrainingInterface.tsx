@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTimer } from '../hooks/useTimer';
 import { Exercise, Evaluation } from '../services/gemini';
 import { Play, Pause, RotateCcw, CheckCircle, PenTool, Award, Printer, UserCircle, Clock, ArrowLeft } from 'lucide-react';
@@ -64,10 +64,15 @@ export function TrainingInterface({
     setIsTimerRunning(isActive);
   }, [isActive, setIsTimerRunning]);
 
+  const onTextChangeRef = useRef(onTextChange);
+  useEffect(() => {
+    onTextChangeRef.current = onTextChange;
+  }, [onTextChange]);
+
   // Sync text changes upwards
   useEffect(() => {
-    onTextChange(text);
-  }, [text, onTextChange]);
+    onTextChangeRef.current(text);
+  }, [text]);
 
   // Switch to eval tab when evaluation arrives
   useEffect(() => {

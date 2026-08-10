@@ -231,5 +231,6 @@ export const resetExercises = async () => {
     await deleteDoc(docSnap.ref);
   }
   localStorage.removeItem('dia_exercises');
+  localStorage.removeItem('dia_deleted_exercises');
 };
 

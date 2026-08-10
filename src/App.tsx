@@ -38,13 +38,6 @@ const DEFAULT_EXERCISES: Exercise[] = [
     type: 'Information'
   },
   {
-    id: 'default-3',
-    title: 'Bewerbung um ein Praktikum',
-    situation: 'Sie haben im Internet eine Anzeige für ein dreimonatiges Praktikum im Bereich Marketing bei der Firma "Mediadesign" in Hamburg gefunden.',
-    content: 'Schreiben Sie Ihre Bewerbung. Behandeln Sie folgende Punkte:\n- Grund für Ihre Bewerbung\n- Ihre bisherigen Erfahrungen and Sprachkenntnisse\n- Warum Sie für dieses Unternehmen arbeiten möchten\n- Fragen zum genauen Arbeitsbeginn',
-    type: 'Bewerbung'
-  },
-  {
     id: 'default-4',
     title: 'Beschwerde: Mietwagen im Urlaub',
     situation: 'Für Ihren einwöchigen Familienurlaub in Spanien haben Sie online bei "Rent-a-Car Premium" einen geräumigen SUV mit voll ausgestatteter Klimaanlage gebucht. Bei der Abholung am Flughafen erhielten Sie jedoch einen kleinen, dreitürigen Kleinwagen. Zudem funktionierte die Klimaanlage nicht, und der Kindersitz fehlte. Trotz mehrmaliger Bitten verweigerte der Kundenservice vor Ort jegliche Unterstützung oder einen Fahrzeugwechsel.',
@@ -87,27 +80,6 @@ const DEFAULT_EXERCISES: Exercise[] = [
     type: 'Information'
   },
   {
-    id: 'default-10',
-    title: 'Bewerbung: Mitarbeiter an der Hotelrezeption',
-    situation: 'Das Grand Hotel "Vier Jahreszeiten" in München sucht für die Sommersaison eine Aushilfe (m/w/d) an der Rezeption und für die Gästebetreuung. Vorausgesetzt werden verhandlungssichere Deutsch- und Englischkenntnisse sowie ein freundliches Auftreten.',
-    content: 'Schreiben Sie Ihr Bewerbungsschreiben. Gehen Sie auf folgende Punkte ein:\n- Grund für Ihre Bewerbung und Bezugnahme auf die Stellenanzeige\n- Ihre Sprachkenntnisse und Ausbildung\n- Bisherige Kundenservice- oder Gastronomieerfahrungen\n- Motivation, für dieses renommierte Hotel zu arbeiten\n- Ihre zeitliche Verfügbarkeit im Sommer',
-    type: 'Bewerbung'
-  },
-  {
-    id: 'default-11',
-    title: 'Bewerbung: Duales Studium "Tourismusmanagement"',
-    situation: 'Sie interessieren sich für ein dreijähriges duales Studium im Bereich Tourismusmanagement mit einem Mix aus Theoriezeiten an der Hochschule und Praxisphasen bei der "Rheinland Reise Gruppe GmbH". Diese vergibt für das nächste Studienjahr zwei begehrte Plätze.',
-    content: 'Schreiben Sie Ihre Bewerbung für das Duale Studium an die Personalabteilung der "Rheinland Reise Gruppe". Behandeln Sie folgende Punkte:\n- Warum Sie sich für den Studiengang Tourismusmanagement entschieden haben\n- Ihre schulischen Leistungen und relevanten Sprachkenntnisse (Deutsch, Englisch)\n- Erste Erfahrungen im Tourismus- oder Servicebereich\n- Warum Sie die Rheinland Reise Gruppe als Praxispartner wählen\n- Ihre Erwartungen an das duale System',
-    type: 'Bewerbung'
-  },
-  {
-    id: 'default-12',
-    title: 'Bewerbung: Aushilfe in einer Buchhandlung',
-    situation: 'Die traditionsreiche Buchhandlung "Buch & Kaffee" in Frankfurt sucht ab sofort eine studentische Aushilfe (m/w/d) für die Wochenenden (Samstage) zur Betreuung der Kunden und zur Pflege der Buchbestände.',
-    content: 'Schreiben Sie Ihre Bewerbung an den Inhaber Herrn Peters. Behandeln Sie folgende Punkte:\n- Warum Sie in einer Buchhandlung arbeiten möchten\n- Ihre persönliche Lese-Affinität und Lieblingsgenres\n- Ihre Erfahrungen im Umgang mit Kunden (Freundlichkeit, Service)\n- Ihre Zuverlässigkeit und zeitliche Flexibilität am Samstag\n- Ihr gewünschter Arbeitsbeginn',
-    type: 'Bewerbung'
-  },
-  {
     id: 'default-13',
     title: 'Beschwerde: Wellness-Wochenende',
     situation: 'Sie haben zur Entspannung ein "Premium-Wellness-Wochenende" im Hotel "Alpenoase" gebucht. Laut Prospekt: beheizter Infinity-Pool, ruhige Lage, 5-Sterne-Zimmerservice und drei Massagen inklusive. Vor Ort: Der Pool war wegen Bauarbeiten gesperrt, lauter Lärm im Hotel ab 7 Uhr morgens, der Zimmerservice unvollständig und es gab nur eine Massage, weil das Personal unterbesetzt war.',
@@ -120,13 +92,6 @@ const DEFAULT_EXERCISES: Exercise[] = [
     situation: 'Sie sind berufstätig im Bereich Logistik und möchten eine zertifizierte berufsbegleitende Weiterbildung im Bereich "Agiles Projektmanagement" absolvieren. Sie haben ein Angebot der Akademie "EduFuture" online gefunden.',
     content: 'Schreiben Sie eine E-Mail an das Sekretariat der Akademie "EduFuture". Klären Sie folgende Punkte:\n- Genaue Termine und Uhrzeiten (Abend- oder Wochenendkurse)\n- Anerkennung des Zertifikats (z.B. PMI oder Scrum Alliance)\n- Kosten und Förderungsmöglichkeiten (z.B. Bildungsgutschein)\n- Voraussetzungen für die Teilnahme an der Abschlussprüfung',
     type: 'Information'
-  },
-  {
-    id: 'default-15',
-    title: 'Bewerbung: Aushilfe im Fitnessstudio',
-    situation: 'Das Fitnessstudio "Fit&Fun" in Ihrer Stadt sucht eine studentische Aushilfe (m/w/d) für die Anmeldung, die Getränkebar und die gelegentliche Betreuung der Trainingsfläche am Wochenende.',
-    content: 'Schreiben Sie Ihre Bewerbung an den Studioleiter Herrn Müller. Behandeln Sie folgende Punkte:\n- Bezugnahme auf die Ausschreibung und Grund der Bewerbung\n- Ihre persönliche Sportbegeisterung und Fitnesskenntnisse\n- Erfahrungen im Umgang mit Kunden und Servicebereitschaft\n- Ihre zeitliche Verfügbarkeit am Wochenende\n- Ihr gewünschter Arbeitsbeginn',
-    type: 'Bewerbung'
   },
   {
     id: 'default-16',
@@ -143,13 +108,6 @@ const DEFAULT_EXERCISES: Exercise[] = [
     type: 'Information'
   },
   {
-    id: 'default-18',
-    title: 'Bewerbung: Hundesitter in München',
-    situation: 'Die Agentur "Paws & Friends" vermittelt qualifizierte und liebevolle Tierbetreuer an Hundebesitzer in München, die tagsüber arbeiten. Gesucht werden tierbegeisterte Menschen für Spaziergänge und Tagesbetreuung.',
-    content: 'Schreiben Sie Ihre Bewerbung für die Aufnahme in die Betreuerkartei. Behandeln Sie folgende Punkte:\n- Motivation für die Arbeit als Hundesitter\n- Bisherige eigene Erfahrungen im Umgang mit Hunden (Rassen, Verhalten)\n- Zuverlässigkeit und Verhalten in stressigen oder unvorhergesehenen Situationen\n- Raumverhältnisse (Wohnung, Nähe zu Parks)\n- Ihre zeitliche Verfügbarkeit unter der Woche',
-    type: 'Bewerbung'
-  },
-  {
     id: 'default-19',
     title: 'Beschwerde: Premium-Essenslieferdienst',
     situation: 'Sie haben für einen Jahrestag ein festliches Drei-Gänge-Menü für vier Personen beim Premium-Lieferdienst "GourmetExpress" bestellt. Gegen Aufpreis wurde eine minutengenaue Lieferung garantiert. Das Essen kam 90 Minuten zu spät, die Suppe war kalt und ausgelaufen, das Hauptgericht vertauscht (vegetarisch statt Rinderfilet) und das Dessert fehlte ganz.',
@@ -162,13 +120,6 @@ const DEFAULT_EXERCISES: Exercise[] = [
     situation: 'Sie möchten Ihren 10-jährigen Sohn für ein zweiwöchiges "Natur- und Abenteuercamp" in Thüringen anmelden, welches vom Verein "WildnisKids e.V." veranstaltet wird. Es bleiben jedoch wesentliche organisatorische Fragen offen.',
     content: 'Schreiben Sie eine E-Mail an den Veranstalter "WildnisKids e.V.". Bitten Sie um Auskunft zu:\n- Betreuerschlüssel (Verhältnis Betreuer zu Kindern) und Qualifikationen\n- Tagesablauf, Aktivitäten und Sicherheitsvorkehrungen bei schlechtem Wetter\n- Unterkunft (Zelte oder feste Häuser) und Verpflegung (Allergene, vegetarisch)\n- Rücktrittsbedingungen bei plötzlicher Erkrankung des Kindes',
     type: 'Information'
-  },
-  {
-    id: 'default-21',
-    title: 'Bewerbung: Social Media Assistant',
-    situation: 'Das zukunftsorientierte Mode-Startup "StyleInspo" aus Berlin sucht einen Social Media Assistant (m/w/d) auf Minijob-Basis (10-15 Stunden/Woche). Aufgaben umfassen die Erstellung von Inhalten für Instagram, TikTok und das Beantworten von Community-Fragen.',
-    content: 'Schreiben Sie Ihre Bewerbung an die Marketingleitung. Gehen Sie auf folgende Punkte ein:\n- Ihre Begeisterung für Mode und Social-Media-Plattformen\n- Erfahrungen im Bereich Content Creation (Fotos, Videos, Reels, Canva etc.)\n- Ihre Kommunikationsstärke und Deutschkenntnisse im Umgang mit Followern\n- Warum Sie speziell für das Startup "StyleInspo" arbeiten möchten\n- Ihre wöchentliche Verfügbarkeit und technisches Equipment',
-    type: 'Bewerbung'
   },
   {
     id: 'default-22',
@@ -185,13 +136,6 @@ const DEFAULT_EXERCISES: Exercise[] = [
     type: 'Information'
   },
   {
-    id: 'default-24',
-    title: 'Bewerbung: Kellner im italienischen Restaurant',
-    situation: 'Das Restaurant "Bella Italia" in Köln sucht für die abendlichen Stoßzeiten und das Wochenende eine engagierte Servicekraft (m/w/d). Erfahrungen im Service sind gewünscht, aber keine zwingende Voraussetzung.',
-    content: 'Schreiben Sie Ihre aussagekräftige Bewerbung an den Geschäftsführer Herrn Rossi. Behandeln Sie folgende Punkte:\n- Ihr Bezug zur Gastronomie und Grund der Bewerbung\n- Ihre Stärken im Servicebereich (Freundlichkeit, Stressresistenz, Teamfähigkeit)\n- Bisherige Tätigkeiten im Kundenkontakt oder in der Gastronomie\n- Ihre Sprachkenntnisse (Deutsch, Englisch, eventuell Italienisch)\n- Ihre zeitliche Flexibilität am Abend und am Wochenende',
-    type: 'Bewerbung'
-  },
-  {
     id: 'default-25',
     title: 'Beschwerde: Fitnessstudio "VitalLife"',
     situation: 'Sie haben einen Jahresvertrag im Studio "VitalLife" unter der Bedingung abgeschlossen, dass Ihnen der Zutritt zum Saunabereich und die Teilnahme an Fitnesskursen jederzeit kostenlos zustehen. Seit drei Monaten ist die Sauna defekt. Außerdem wurden fast alle Pilates- und Yogakurse ohne Ersatz gestrichen. Trotzdem bucht das Studio den vollen Monatsbeitrag ab.',
@@ -204,13 +148,6 @@ const DEFAULT_EXERCISES: Exercise[] = [
     situation: 'Sie haben ein abgeschlossenes Medizinstudium im Ausland absolviert und möchten bald als Assistenzarzt in Deutschland arbeiten. Zur Beantragung der Approbation benötigen Sie die Fachsprachenprüfung (FSP). Sie interessieren sich für die Vorbereitungskurse des Anbieters "Med-Deutsch Akademie".',
     content: 'Schreiben Sie eine Anfrage-E-Mail an die Kursleitung der "Med-Deutsch Akademie". Fragen Sie nach:\n- Dauer, Startterminen und Preisen des speziellen FSP-Zertifikatskurses\n- Lerninhalten (Patientengespräche, Arztbriefe, medizinische Dokumentation)\n- Qualifikationen der Dozenten (Mediziner oder zertifizierte Sprachlehrer)\n- Möglichkeit eines Online- oder Hybridkurses und Bestehensquote der Teilnehmer',
     type: 'Information'
-  },
-  {
-    id: 'default-27',
-    title: 'Bewerbung: Mitarbeiter im Kundendienst',
-    situation: 'Das E-Commerce-Unternehmen "EcoCart" vertreibt ökologische Haushaltswaren und sucht ab sofort Mitarbeiter (m/w/d) im Kundenservice für die schriftliche und telefonische Kundenbetreuung, vollständig im Homeoffice (Remote).',
-    content: 'Schreiben Sie Ihre Bewerbung an die Personalabteilung von "EcoCart". Gehen Sie auf folgende Punkte ein:\n- Grund der Bewerbung und Ihre Identifikation mit ökologischen Produkten\n- Ihre Stärken in der schriftlichen und mündlichen Kommunikation (Freundlichkeit, Geduld)\n- Ihre Erfahrungen mit PC-Arbeit, Kundensystemen oder Office-Paketen\n- Ihr eingerichteter, ungestörter Heimarbeitsplatz mit stabiler Internetverbindung\n- Ihre Gehaltsvorstellung (Stundenlohn) und gewünschte Wochenarbeitszeit',
-    type: 'Bewerbung'
   },
   {
     id: 'default-28',
@@ -227,13 +164,6 @@ const DEFAULT_EXERCISES: Exercise[] = [
     type: 'Information'
   },
   {
-    id: 'default-30',
-    title: 'Bewerbung: Event-Aushilfe auf Musikmesse',
-    situation: 'Für die internationale Musikmesse "Musicon" in Frankfurt sucht der Veranstalter "MesseFrankfurt GmbH" kurzfristig zweisprachige Event-Aushilfen (m/w/d) für die Besucherregistrierung, Wegeleitung und Informationsstände.',
-    content: 'Schreiben Sie Ihre Bewerbung für diesen Messejob. Behandeln Sie folgende Punkte:\n- Bezug auf die Stellenausschreibung und Motivation für die Mitarbeit auf der Musikmesse\n- Ihre Sprachkenntnisse (Deutsch, Englisch fließend, weitere Sprachen)\n- Ihre Kontaktfreudigkeit, Belastbarkeit bei hohem Besucheraufkommen und gepflegtes Auftreten\n- Erfahrungen aus früheren Messen, Promotionjobs oder dem Kundenservice\n- Bestätigung Ihrer uneingeschränkten Zugänglichkeit an allen vier Messetagen',
-    type: 'Bewerbung'
-  },
-  {
     id: 'default-31',
     title: 'Beschwerde: Streamingdienst Abo-Abrechnung',
     situation: 'Sie nutzen seit einem Jahr den Streamingdienst "MoviePlus". Vor kurzem wurde ohne Ihre Zustimmung der Paketpreis um 50 % erhöht. Zudem wurde Ihnen trotz fristgerechter Kündigung des Premium-Zusatzpakets der Betrag für drei weitere Monate abgebucht. Der telefonische Support hat Ihr Anliegen ignoriert.',
@@ -246,13 +176,6 @@ const DEFAULT_EXERCISES: Exercise[] = [
     situation: 'Sie studieren Germanistik in Ihrem Heimatland und möchten im nächsten Frühjahr ein einsemestriges Erasmus-Auslandsstudium an der Universität Heidelberg absolvieren. Viele administrative Schritte sind noch unklar.',
     content: 'Schreiben Sie eine E-Mail an das Akademische Auslandsamt (AAA) der Universität Heidelberg. Fragen Sie nach:\n- Fristen für die Einreichung der Zulassungsunterlagen und Anerkennung von bisherigen Noten\n- Unterstützung bei der Vermittlung eines Zimmers in einem staatlichen Studentenwohnheim\n- Angebot von fachbegleitenden Deutschkursen für ausländische Studenten vor Semesterbeginn\n- Orientierungsangebote (Buddy-Programm, Einführungsveranstaltungen)',
     type: 'Information'
-  },
-  {
-    id: 'default-33',
-    title: 'Bewerbung: Werkstudent im IT-Support',
-    situation: 'Das Software-Unternehmen "NetSolutions" in Stuttgart sucht einen Werkstudenten (m/w/d) für den hausinternen IT-Support und die Pflege der Netzwerksicherheit (16-20 Std./Woche).',
-    content: 'Schreiben Sie ein aussagekräftiges Bewerbungsschreiben. Gehen Sie auf folgende Punkte ein:\n- Bezugnahme auf das Stellenangebot und Grund Ihrer Bewerbung\n- Ihr Studiengang (Informatik, Wirtschaftsinformatik o.Ä.) und aktuelles Semester\n- Praktische Kenntnisse in Betriebssystemen, Netzwerken, Hardware-Fehleranalyse\n- Ihre Arbeitsweise (selbstständig, zielstrebig, teamorientiert)\n- Ihre zeitliche Verfügbarkeit unter der Woche (Abstimmung mit Vorlesungszeiten)',
-    type: 'Bewerbung'
   },
   {
     id: 'default-34',
@@ -269,13 +192,6 @@ const DEFAULT_EXERCISES: Exercise[] = [
     type: 'Information'
   },
   {
-    id: 'default-36',
-    title: 'Bewerbung: Stadtführer in Berlin',
-    situation: 'Die Tourismus-Agentur "BerlinExplorer" sucht für Stadtrundgänge sowie geführte Fahrradtouren durch Berlin-Mitte und Kreuzberg enthusiastische, offene und ortskundige Stadtführer (m/w/d) für die Wochenenden.',
-    content: 'Schreiben Sie Ihre Bewerbung als Stadtführer an den Personalverantwortlichen. Behandeln Sie folgende Punkte:\n- Warum Sie Stadtführer in Berlin werden möchten und Ihre Verbindung zur Stadt\n- Ihre Ortskenntnisse in Berlin (Geschichte, Kultur, Geheimtipps)\n- Ihre Fremdsprachenkenntnisse (Deutsch verhandlungssicher, weitere Sprachen von Vorteil)\n- Erfahrungen im Vortragen vor größeren Gruppen (Präsentationen, offene Art)\n- Ihre zeitliche Verfügbarkeit am Wochenende und sportliche Fitness (Fahrradtouren)',
-    type: 'Bewerbung'
-  },
-  {
     id: 'default-37',
     title: 'Beschwerde: Online-Fotobuch Druckfehler',
     situation: 'Sie haben über das Portal "PixPrint" ein hochwertiges, teures Hardcover-Fotobuch mit 100 Seiten als Geschenk für die Goldene Hochzeit Ihrer Großeltern bestellt. Bei der Lieferung stellten Sie fest: Der Bucheinband ist schief aufgeklebt, die Farben sind extrem dunkel und verwaschen, und auf 5 Seiten fehlt der gedruckte Text komplett, obwohl er im Vorschau-Editor korrekt angezeigt wurde.',
@@ -289,13 +205,6 @@ const DEFAULT_EXERCISES: Exercise[] = [
     content: 'Schreiben Sie eine E-Mail an den Vorstand des Tennis-Clubs. Erkundigen Sie sich nach:\n- Aufnahmegebühr und monatlichem/jährlichem Mitgliedsbeitrag (Ermäßigung für Studenten/Familien)\n- Ausstattung des Clubs (Anzahl der Außen- und Hallenplätze, Buchungssystem für Spielfelder)\n- Trainingsmöglichkeiten für Erwachsene (Gruppentraining mit professionellem Trainer, Spielstärkeneinstufung)\n- Clubleben, Turnieren für Freizeitsportler und Kennenlern-Treffs für neue Mitglieder',
     type: 'Information'
   },
-  {
-    id: 'default-39',
-    title: 'Bewerbung: Rezeptionist in Jugendherberge',
-    situation: 'Die Jugendherberge "CityHostel Dresden" sucht ab der kommenden Frühjahrssaison einen Rezeptionisten (m/w/d) in Teilzeit (20 Stunden/Woke) zur Betreuung internationaler Backpacker, Check-in/Check-out und Organisation kleiner Events.',
-    content: 'Schreiben Sie Ihre Bewerbung für das CityHostel. Behandeln Sie folgende Punkte:\n- Ihre Motivation, in einem lebhaften, internationalen Hostel zu arbeiten\n- Erste Erfahrungen im Beherbergungsgewerbe oder im engen Kundenkontakt\n- Ausgeprägte Sprachkenntnisse (Deutsch verhandlungssicher, Englisch fließend, weitere Sprachen)\n- Ihre Computerkenntnisse (E-Mail, Buchungssoftware, Social Media)\n- Flexibilität bei Schichtarbeit (Früh-, Spät- und gelegentliche Wochenendschichten)',
-    type: 'Bewerbung'
-  }
 ];
 
 const getDeletedIds = (): Set<string> => {
@@ -321,7 +230,7 @@ function App() {
         if (Array.isArray(parsed) && parsed.length > 0) {
           const existingIds = new Set(parsed.map((e: Exercise) => e.id));
           const missingDefaults = DEFAULT_EXERCISES.filter(e => !existingIds.has(e.id) && !deletedIds.has(e.id));
-          const combined = [...parsed, ...missingDefaults];
+          const combined = [...parsed.filter((e: Exercise) => e.type !== 'Bewerbung'), ...missingDefaults];
           localStorage.setItem('dia_exercises', JSON.stringify(combined));
           return combined;
         }
@@ -396,14 +305,39 @@ function App() {
     const unsubscribe = onSnapshot(q, (snap) => {
       const firestoreExercises: Exercise[] = [];
       snap.forEach(doc => {
-        firestoreExercises.push(doc.data() as Exercise);
+        const data = doc.data() as Exercise;
+        if (data.type !== 'Bewerbung') {
+          firestoreExercises.push(data);
+        }
       });
       
       const deletedIds = getDeletedIds();
+
+      // Retrieve local custom exercises from localStorage so user imported subjects are never wiped out
+      let localSaved: Exercise[] = [];
+      try {
+        const saved = localStorage.getItem('dia_exercises');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) {
+            localSaved = parsed.filter((e: Exercise) => e.type !== 'Bewerbung');
+          }
+        }
+      } catch (e) {
+        console.error("Error reading local exercises:", e);
+      }
+      
       setExercises(() => {
         const fsIds = new Set(firestoreExercises.map(e => e.id));
-        const missingDefaults = DEFAULT_EXERCISES.filter(e => !fsIds.has(e.id) && !deletedIds.has(e.id));
-        const combined = [...firestoreExercises, ...missingDefaults];
+        const validFsExercises = firestoreExercises.filter(e => !deletedIds.has(e.id));
+        
+        // Preserve local imported / custom subjects that are not in Firestore snapshot and not deleted
+        const localCustom = localSaved.filter(e => !fsIds.has(e.id) && !deletedIds.has(e.id));
+
+        const knownIds = new Set([...validFsExercises.map(e => e.id), ...localCustom.map(e => e.id)]);
+        const missingDefaults = DEFAULT_EXERCISES.filter(e => !knownIds.has(e.id) && !deletedIds.has(e.id));
+
+        const combined = [...validFsExercises, ...localCustom, ...missingDefaults];
 
         localStorage.setItem('dia_exercises', JSON.stringify(combined));
         return combined;
@@ -416,9 +350,10 @@ function App() {
         try {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            const existingIds = new Set(parsed.map((e: Exercise) => e.id));
+            const validParsed = parsed.filter((e: Exercise) => !deletedIds.has(e.id) && e.type !== 'Bewerbung');
+            const existingIds = new Set(validParsed.map((e: Exercise) => e.id));
             const missingDefaults = DEFAULT_EXERCISES.filter(e => !existingIds.has(e.id) && !deletedIds.has(e.id));
-            setExercises([...parsed, ...missingDefaults]);
+            setExercises([...validParsed, ...missingDefaults]);
             return;
           }
         } catch (e) {
@@ -517,7 +452,27 @@ function App() {
   const selectedExercise = useMemo(() => exercises.find(e => e.id === selectedId), [exercises, selectedId]);
   const currentProgress = selectedId ? progress[selectedId] : null;
 
-  
+  const onTextChange = useCallback((text: string) => {
+    if (!selectedId || !user) return;
+    
+    setProgress(prev => {
+      const current = prev[selectedId];
+      if (current?.text === text) return prev;
+      const newProgress = { ...prev, [selectedId]: { ...current, text } };
+      localStorage.setItem('dia_progress', JSON.stringify(newProgress));
+      return newProgress;
+    });
+
+    if (isOnline) {
+      setDoc(doc(db, 'users', user.uid, 'progress', selectedId), { 
+        exerciseId: selectedId,
+        text, 
+        updatedAt: serverTimestamp() 
+      }, { merge: true })
+        .catch(err => handleFirestoreError(err, OperationType.UPDATE, `users/${user.uid}/progress/${selectedId}`));
+    }
+  }, [selectedId, user, isOnline]);
+
   if (isLoadingAuth) {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-50 dark:bg-gray-950">
@@ -584,18 +539,6 @@ function App() {
     }
   };
 
-  const onTextChange = (text: string) => {
-    if (!selectedId || !user) return;
-    const newProgress = { ...progress, [selectedId]: { ...progress[selectedId], text } };
-    setProgress(newProgress);
-    localStorage.setItem('dia_progress', JSON.stringify(newProgress));
-    
-    if (isOnline) {
-      setDoc(doc(db, 'users', user.uid, 'progress', selectedId), { text, updatedAt: serverTimestamp() }, { merge: true })
-        .catch(err => handleFirestoreError(err, OperationType.UPDATE, `users/${user.uid}/progress/${selectedId}`));
-    }
-  };
-
   const onEvaluate = async () => {
     if (!selectedExercise || !currentProgress?.text || !user || !userProfile) return;
     if (!isOnline) {
@@ -610,20 +553,29 @@ function App() {
       setProgress(newProgress);
       localStorage.setItem('dia_progress', JSON.stringify(newProgress));
 
+      const subRef = doc(collection(db, 'submissions'));
       const submission = {
+        id: subRef.id,
         studentId: user.uid,
-        studentName: userProfile.displayName || user.email,
+        studentName: userProfile.displayName || user.email || 'Étudiant',
         exerciseId: selectedExercise.id,
         exerciseTitle: selectedExercise.title,
         text: currentProgress.text,
         evaluation: result,
-        createdAt: new Date().toISOString()
+        status: 'soumis',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
       
-      await setDoc(doc(collection(db, 'submissions')), submission);
+      await setDoc(subRef, submission);
       
       await setDoc(doc(db, 'users', user.uid, 'progress', selectedId!), 
-        { evaluation: result, updatedAt: serverTimestamp() }, 
+        { 
+          exerciseId: selectedId!,
+          text: currentProgress.text,
+          evaluation: result, 
+          updatedAt: serverTimestamp() 
+        }, 
         { merge: true }
       );
       
@@ -665,14 +617,14 @@ function App() {
   );
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white font-sans overflow-hidden">
+    <div className="flex flex-col h-[100dvh] bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white font-sans overflow-hidden">
       {/* Global Header */}
       <header className="h-16 shrink-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-4 sm:px-6 shadow-sm z-10">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-[#FF0000] flex items-center justify-center text-white font-black text-lg shadow-md">
             T
           </div>
-          <h1 className="font-bold text-lg hidden sm:block tracking-tight">Telc Deutsch B2</h1>
+          <h1 className="font-bold text-base sm:text-lg tracking-tight">Telc Deutsch B2</h1>
         </div>
 
         <div className="flex items-center gap-2 sm:gap-4">
@@ -686,17 +638,15 @@ function App() {
              </div>
           )}
 
-
-
           <div className="flex items-center gap-2">
-            <div className="hidden sm:flex flex-col items-end">
-              <span className="text-xs font-bold">{user?.displayName || 'Utilisateur'}</span>
+            <div className="flex flex-col items-end">
+              <span className="text-xs font-bold max-w-[100px] sm:max-w-none truncate">{user?.displayName || 'Utilisateur'}</span>
               <span className="text-[9px] text-gray-500">{userProfile?.role === 'super_admin' ? 'Super Admin' : userProfile?.role === 'admin' ? 'Admin' : 'Étudiant'}</span>
             </div>
             
             <button 
               onClick={logout}
-              className="p-1.5 sm:p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+              className="p-1.5 sm:p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors shrink-0"
               title="Se déconnecter"
             >
               <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -707,7 +657,8 @@ function App() {
 
       {/* Main Content Area */}
       <main className="flex-1 min-h-0 overflow-y-auto bg-gray-50 dark:bg-gray-950 relative">
-        <div className="h-full">
+        <div className="min-h-full">
+
           {userProfile?.role === 'super_admin' && !isUploading && !selectedExercise ? (
             <SuperAdminDashboardView 
               exercises={exercises} 

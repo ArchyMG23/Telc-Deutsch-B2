@@ -97,62 +97,62 @@ export function AdminDashboard({ exercises, onUpload, isExtracting, isOnline, de
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 h-full flex flex-col">
-      <h1 className="text-3xl font-bold mb-8">Tableau de bord Super Admin</h1>
+    <div className="max-w-6xl mx-auto p-4 sm:p-6 w-full flex flex-col space-y-6">
+      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Tableau de bord Super Admin</h1>
       
-      <div className="flex gap-4 mb-8">
+      {/* Scrollable Tab Navigation on Mobile */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 shrink-0">
         <button 
           onClick={() => setActiveTab('users')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === 'users' ? 'bg-[#FF0000] text-white' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+          className={`whitespace-nowrap shrink-0 flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 rounded-xl font-medium text-xs sm:text-sm transition-colors ${activeTab === 'users' ? 'bg-[#FF0000] text-white shadow-sm' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
         >
-          <Users className="w-5 h-5" /> Utilisateurs
+          <Users className="w-4 h-4 sm:w-5 sm:h-5" /> Utilisateurs
         </button>
         <button 
           onClick={() => setActiveTab('exercises')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === 'exercises' ? 'bg-[#FF0000] text-white' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+          className={`whitespace-nowrap shrink-0 flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 rounded-xl font-medium text-xs sm:text-sm transition-colors ${activeTab === 'exercises' ? 'bg-[#FF0000] text-white shadow-sm' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
         >
-          <BookOpen className="w-5 h-5" /> Exercices
+          <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" /> Exercices
         </button>
         <button 
           onClick={() => setActiveTab('rules')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === 'rules' ? 'bg-[#FF0000] text-white' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+          className={`whitespace-nowrap shrink-0 flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 rounded-xl font-medium text-xs sm:text-sm transition-colors ${activeTab === 'rules' ? 'bg-[#FF0000] text-white shadow-sm' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
         >
-          <Settings className="w-5 h-5" /> Grilles d'évaluation
+          <Settings className="w-4 h-4 sm:w-5 sm:h-5" /> Grilles d'évaluation
         </button>
         <button 
           onClick={() => setActiveTab('corrections')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === 'corrections' ? 'bg-[#FF0000] text-white' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+          className={`whitespace-nowrap shrink-0 flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 rounded-xl font-medium text-xs sm:text-sm transition-colors ${activeTab === 'corrections' ? 'bg-[#FF0000] text-white shadow-sm' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
         >
-          <GraduationCap className="w-5 h-5" /> Corrections
+          <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5" /> Corrections
         </button>
       </div>
 
       {activeTab === 'users' && (
-        
-        <div className="flex flex-col gap-6 h-full overflow-y-auto">
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Gestion du Système</h2>
-              <div className="flex gap-2">
+        <div className="flex flex-col gap-6">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 sm:p-6 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+              <h2 className="text-lg sm:text-xl font-bold">Gestion du Système</h2>
+              <div className="flex flex-col sm:flex-row gap-2">
                 <button 
                   onClick={handleResetUsers}
                   disabled={isResetting}
-                  className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2"
+                  className="bg-orange-600 hover:bg-orange-700 text-white px-3 py-2 rounded-lg font-medium text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors"
                 >
-                  <Trash2 className="w-4 h-4" /> {isResetting ? "..." : "Réinitialiser les utilisateurs et soumissions"}
+                  <Trash2 className="w-4 h-4" /> {isResetting ? "..." : "Réinitialiser utilisateurs"}
                 </button>
                 <button 
                   onClick={handleResetExercisesData}
                   disabled={isResetting}
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2"
+                  className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg font-medium text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors"
                 >
-                  <Trash2 className="w-4 h-4" /> {isResetting ? "..." : "Réinitialiser les documents uploadés (Exercices)"}
+                  <Trash2 className="w-4 h-4" /> {isResetting ? "..." : "Réinitialiser exercices uploadés"}
                 </button>
               </div>
             </div>
             
-            <h3 className="text-lg font-semibold mt-6 mb-3">Créer un compte Admin</h3>
-            <form onSubmit={handleCreateAdmin} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <h3 className="text-base font-semibold mt-6 mb-3">Créer un compte Admin</h3>
+            <form onSubmit={handleCreateAdmin} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1">Nom complet</label>
                 <input type="text" required value={newAdminName} onChange={e => setNewAdminName(e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm bg-transparent" placeholder="Nom de l'admin" />
@@ -165,67 +165,66 @@ export function AdminDashboard({ exercises, onUpload, isExtracting, isOnline, de
                 <label className="block text-xs font-semibold text-gray-500 mb-1">Mot de passe provisoire</label>
                 <input type="password" required value={newAdminPassword} onChange={e => setNewAdminPassword(e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm bg-transparent" placeholder="Minimum 6 caractères" minLength={6} />
               </div>
-              <button type="submit" disabled={isCreatingAdmin} className="bg-[#FF0000] hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-sm h-[38px]">
+              <button type="submit" disabled={isCreatingAdmin} className="bg-[#FF0000] hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-sm h-[38px] transition-colors">
                 {isCreatingAdmin ? "Création..." : "Créer l'Admin"}
               </button>
             </form>
           </div>
 
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden flex-1">
-
-          <table className="w-full text-left text-sm">
-            <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-              <tr>
-                <th className="p-4 font-medium text-gray-600 dark:text-gray-300">Nom</th>
-                <th className="p-4 font-medium text-gray-600 dark:text-gray-300">Email</th>
-                <th className="p-4 font-medium text-gray-600 dark:text-gray-300">Rôle</th>
-                <th className="p-4 font-medium text-gray-600 dark:text-gray-300">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
-              {loading ? (
-                <tr><td colSpan={4} className="p-8 text-center text-gray-500">Chargement...</td></tr>
-              ) : (
-                users.map(user => (
-                  <tr key={user.uid} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                    <td className="p-4">{user.displayName || 'Sans nom'}</td>
-                    <td className="p-4 text-gray-500">{user.email}</td>
-                    <td className="p-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        user.role === 'super_admin' ? 'bg-purple-100 text-purple-700' :
-                        user.role === 'admin' ? 'bg-blue-100 text-blue-700' :
-                        'bg-green-100 text-green-700'
-                      }`}>
-                        {user.role}
-                      </span>
-                    </td>
-                    <td className="p-4">
-                      <select 
-                        value={user.role} 
-                        onChange={(e) => handleRoleChange(user.uid, e.target.value as UserRole)}
-                        className="bg-gray-100 dark:bg-gray-800 border-none rounded-lg text-sm"
-                      >
-                        <option value="student">Étudiant</option>
-                        <option value="admin">Admin</option>
-                        <option value="super_admin">Super Admin</option>
-                      </select>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-x-auto shadow-sm">
+            <table className="w-full text-left text-sm min-w-[500px]">
+              <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                <tr>
+                  <th className="p-4 font-medium text-gray-600 dark:text-gray-300">Nom</th>
+                  <th className="p-4 font-medium text-gray-600 dark:text-gray-300">Email</th>
+                  <th className="p-4 font-medium text-gray-600 dark:text-gray-300">Rôle</th>
+                  <th className="p-4 font-medium text-gray-600 dark:text-gray-300">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+                {loading ? (
+                  <tr><td colSpan={4} className="p-8 text-center text-gray-500">Chargement...</td></tr>
+                ) : (
+                  users.map(user => (
+                    <tr key={user.uid} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                      <td className="p-4 font-medium">{user.displayName || 'Sans nom'}</td>
+                      <td className="p-4 text-gray-500">{user.email}</td>
+                      <td className="p-4">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          user.role === 'super_admin' ? 'bg-purple-100 text-purple-700' :
+                          user.role === 'admin' ? 'bg-blue-100 text-blue-700' :
+                          'bg-green-100 text-green-700'
+                        }`}>
+                          {user.role}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        <select 
+                          value={user.role} 
+                          onChange={(e) => handleRoleChange(user.uid, e.target.value as UserRole)}
+                          className="bg-gray-100 dark:bg-gray-800 border-none rounded-lg text-xs sm:text-sm p-1.5"
+                        >
+                          <option value="student">Étudiant</option>
+                          <option value="admin">Admin</option>
+                          <option value="super_admin">Super Admin</option>
+                        </select>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
       {activeTab === 'exercises' && (
-        <div className="flex flex-col gap-8 h-full">
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden p-6">
+        <div className="flex flex-col gap-6">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 sm:p-6 shadow-sm">
              <UploadSection onUpload={onUpload} isExtracting={isExtracting} isOnline={isOnline} />
           </div>
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden flex-1 overflow-y-auto">
-             <table className="w-full text-left text-sm">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-x-auto shadow-sm">
+             <table className="w-full text-left text-sm min-w-[500px]">
                 <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                   <tr>
                     <th className="p-4 font-medium text-gray-600 dark:text-gray-300">Titre</th>
@@ -233,7 +232,7 @@ export function AdminDashboard({ exercises, onUpload, isExtracting, isOnline, de
                     <th className="p-4 font-medium text-gray-600 dark:text-gray-300 text-right">Actions</th>
                   </tr>
                 </thead>
-                                                                <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
                   {exercises.map(ex => (
                     <tr 
                       key={ex.id}
@@ -242,11 +241,11 @@ export function AdminDashboard({ exercises, onUpload, isExtracting, isOnline, de
                     >
                       <td className="p-4 font-semibold">
                         <div className="flex items-center gap-2">
-                          <Eye className="w-4 h-4 text-gray-400" />
-                          {ex.title}
+                          <Eye className="w-4 h-4 text-gray-400 shrink-0" />
+                          <span className="line-clamp-1">{ex.title}</span>
                         </div>
                       </td>
-                      <td className="p-4 text-gray-500">{ex.type}</td>
+                      <td className="p-4 text-gray-500 whitespace-nowrap">{ex.type}</td>
                       <td className="p-4 text-right flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
                         {onSelectExercise && (
                           <button onClick={(e) => {
@@ -276,24 +275,24 @@ export function AdminDashboard({ exercises, onUpload, isExtracting, isOnline, de
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
               <div className="bg-white dark:bg-gray-900 w-full max-w-4xl rounded-2xl shadow-xl flex flex-col max-h-[90vh] border border-gray-200 dark:border-gray-800">
                 <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-800">
-                  <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
-                    <BookOpen className="w-6 h-6 text-[#FF0000]" />
-                    {exercises.find(e => e.id === previewExerciseId)?.title}
+                  <h2 className="text-lg sm:text-2xl font-bold flex items-center gap-2 pr-2">
+                    <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-[#FF0000] shrink-0" />
+                    <span className="line-clamp-1">{exercises.find(e => e.id === previewExerciseId)?.title}</span>
                   </h2>
-                  <button onClick={() => setPreviewExerciseId(null)} className="p-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-full transition-colors">
+                  <button onClick={() => setPreviewExerciseId(null)} className="p-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-full transition-colors shrink-0">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
                 <div className="p-4 sm:p-6 overflow-y-auto space-y-6">
                   <div>
-                    <h4 className="font-bold text-sm uppercase text-[#FF0000] mb-2 tracking-wide">Situation / Offre</h4>
-                    <div className="p-5 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 whitespace-pre-wrap text-base text-gray-800 dark:text-gray-200 leading-relaxed shadow-sm">
+                    <h4 className="font-bold text-xs sm:text-sm uppercase text-[#FF0000] mb-2 tracking-wide">Situation / Offre</h4>
+                    <div className="p-4 sm:p-5 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 whitespace-pre-wrap text-sm sm:text-base text-gray-800 dark:text-gray-200 leading-relaxed shadow-sm">
                       {exercises.find(e => e.id === previewExerciseId)?.situation}
                     </div>
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm uppercase text-[#FF0000] mb-2 tracking-wide">Consigne</h4>
-                    <div className="p-5 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 whitespace-pre-wrap text-base text-gray-800 dark:text-gray-200 leading-relaxed shadow-sm">
+                    <h4 className="font-bold text-xs sm:text-sm uppercase text-[#FF0000] mb-2 tracking-wide">Consigne</h4>
+                    <div className="p-4 sm:p-5 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 whitespace-pre-wrap text-sm sm:text-base text-gray-800 dark:text-gray-200 leading-relaxed shadow-sm">
                       {exercises.find(e => e.id === previewExerciseId)?.content}
                     </div>
                   </div>
@@ -305,13 +304,14 @@ export function AdminDashboard({ exercises, onUpload, isExtracting, isOnline, de
       )}
 
       {activeTab === 'corrections' && (
-        <div className="h-full">
+        <div className="min-h-[500px]">
           <TeacherDashboard />
         </div>
       )}
 
       {activeTab === 'rules' && (
-        <div className="flex flex-col gap-6 h-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 overflow-y-auto">
+        <div className="flex flex-col gap-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 sm:p-6 shadow-sm">
+
            <div>
              <h2 className="text-2xl font-bold mb-2">Grille d'évaluation Telc B2 (Schriftlicher Ausdruck)</h2>
              <p className="text-gray-500 mb-6">Cette grille est utilisée par l'IA pour évaluer automatiquement les productions écrites des étudiants. Le score maximal est de 45 points.</p>

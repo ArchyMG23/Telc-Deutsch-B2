@@ -57,9 +57,9 @@ export function TeacherDashboard() {
   };
 
   return (
-    <div className="flex h-full overflow-hidden">
+    <div className="flex flex-col lg:flex-row min-h-[600px] border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-sm">
       {/* Submissions List */}
-      <div className={`${selectedSub ? 'hidden lg:flex' : 'flex'} w-full lg:w-80 border-r border-[#E5E7EB] dark:border-gray-800 bg-[#F9FAFB] dark:bg-gray-900/50 flex-col shrink-0 h-full`}>
+      <div className={`${selectedSub ? 'hidden lg:flex' : 'flex'} w-full lg:w-80 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 flex-col shrink-0 min-h-[300px] lg:min-h-0`}>
         <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
           <h2 className="font-bold flex items-center gap-2 text-sm sm:text-base">
             <Clock className="w-4 h-4 text-indigo-500" />
