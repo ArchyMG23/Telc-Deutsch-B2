@@ -9,7 +9,7 @@ import { TrainingInterface } from './components/TrainingInterface';
 import { StudentDashboard } from './components/StudentDashboard';
 import { InstallPWA } from './components/InstallPWA';
 import { extractExercises, evaluateWriting, Exercise, Evaluation } from './services/gemini';
-import { BookOpen, Plus, ShieldCheck, CheckCircle, Clock, WifiOff, LogIn, LogOut, Cloud, User as UserIcon, Mail, Users, GraduationCap, Menu, X, Search, Trash2 , Upload, ChevronRight} from 'lucide-react';
+import { BookOpen, Plus, ShieldCheck, CheckCircle, Clock, WifiOff, LogIn, LogOut, Cloud, User as UserIcon, Mail, Users, GraduationCap, Menu, X, Search, Trash2 , Upload, ChevronRight, RotateCcw } from 'lucide-react';
 import { auth, loginWithGoogle, logout, db, OperationType, handleFirestoreError, updateUserRole, loginWithEmail, signUpWithEmail } from './lib/firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { collection, doc, setDoc, updateDoc, onSnapshot, serverTimestamp, query, orderBy, where, deleteDoc } from 'firebase/firestore';
