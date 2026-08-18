@@ -369,6 +369,8 @@ function App() {
   // Sync Auth & Profile
   useEffect(() => {
     let unsubscribeProfile: (() => void) | null = null;
+    let unsubscribeSubs: (() => void) | null = null;
+    let unsubscribeTeachers: (() => void) | null = null;
 
     const unsubscribeAuth = onAuthStateChanged(auth, (u) => {
       setUser(u);
@@ -379,13 +381,32 @@ function App() {
         unsubscribeProfile();
         unsubscribeProfile = null;
       }
+      if (unsubscribeSubs) {
+        unsubscribeSubs();
+        unsubscribeSubs = null;
+      }
+      if (unsubscribeTeachers) {
+        unsubscribeTeachers();
+        unsubscribeTeachers = null;
+      }
 
       if (u) {
         const subsQ = query(collection(db, 'submissions'), where('studentId', '==', u.uid), orderBy('createdAt', 'desc'));
-        const unsubscribeSubs = onSnapshot(subsQ, (snap) => {
+        unsubscribeSubs = onSnapshot(subsQ, (snap) => {
           const list: any[] = [];
           snap.forEach(d => list.push(d.data()));
           setSubmissions(list);
+        });
+        
+        // Also query teachers (admin or super_admin)
+        const teachersQ = query(collection(db, 'users'), where('role', 'in', ['admin', 'super_admin']));
+        unsubscribeTeachers = onSnapshot(teachersQ, (snap) => {
+          const tList: any[] = [];
+          snap.forEach(d => {
+            const data = d.data();
+            tList.push({ ...data, uid: d.id });
+          });
+          setTeachers(tList);
         });
         
         const profileRef = doc(db, 'users', u.uid);
@@ -425,6 +446,12 @@ function App() {
       unsubscribeAuth();
       if (unsubscribeProfile) {
         unsubscribeProfile();
+      }
+      if (unsubscribeSubs) {
+        unsubscribeSubs();
+      }
+      if (unsubscribeTeachers) {
+        unsubscribeTeachers();
       }
     };
   }, []);
@@ -493,6 +520,18 @@ function App() {
     setSelectedId(id);
     setIsUploading(upload);
     setIsMenuOpen(false);
+  };
+
+  const handleRetryExercise = (exerciseId: string) => {
+    if (confirm("Voulez-vous vraiment refaire ce sujet ? Votre évaluation précédente sera supprimée.")) {
+      setProgress(prev => {
+        const newProgress = { ...prev };
+        delete newProgress[exerciseId];
+        localStorage.setItem('dia_progress', JSON.stringify(newProgress));
+        return newProgress;
+      });
+      selectExercise(exerciseId);
+    }
   };
 
   const handleUpload = async (fileData: string, mimeType: string) => {
@@ -740,9 +779,20 @@ function App() {
                       {ex.type}
                     </span>
                     {progress[ex.id]?.evaluation && (
-                      <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-md">
-                        <CheckCircle className="w-3 h-3" /> Terminé
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRetryExercise(ex.id);
+                          }}
+                          className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md transition-colors"
+                        >
+                          <RotateCcw className="w-3 h-3" /> Refaire
+                        </button>
+                        <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-md">
+                          <CheckCircle className="w-3 h-3" /> Terminé
+                        </span>
+                      </div>
                     )}
                   </div>
                   
