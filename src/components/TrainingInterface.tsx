@@ -19,13 +19,14 @@ interface TrainingInterfaceProps {
   setIsTimerRunning: (val: boolean) => void;
   teachers: any[];
   user: User | null;
+  userRole?: string;
   lastTeacherId?: string;
   onExit: () => void;
 }
 
 export function TrainingInterface({ 
   exercise, initialText, evaluation, onTextChange, onEvaluate, isEvaluating, isOnline,
-  isTimerRunning, setIsTimerRunning, teachers, user, lastTeacherId, onExit
+  isTimerRunning, setIsTimerRunning, teachers, user, userRole, lastTeacherId, onExit
 }: TrainingInterfaceProps) {
   const [text, setText] = useState(initialText);
   const [activeTab, setActiveTab] = useState<'topic' | 'write' | 'eval'>(evaluation ? 'eval' : 'write');
@@ -39,6 +40,18 @@ export function TrainingInterface({
       start();
     }
   }, [evaluation, start]);
+
+  // Prevent accidental tab close/refresh
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!evaluation && text.trim().length > 0) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [evaluation, text]);
 
   const hasEndedRedaction = isFinished || isRedactionFinished || !!evaluation;
 
@@ -145,13 +158,15 @@ export function TrainingInterface({
       {/* Header */}
       <header className="flex items-center justify-between px-4 sm:px-6 py-2.5 sm:py-3.5 border-b border-gray-200 dark:border-gray-800 shrink-0 select-none bg-white dark:bg-gray-900 z-10 shadow-xs">
         <div className="flex items-center gap-2 sm:gap-4 min-w-0">
-          <button 
-            onClick={onExit}
-            className="p-1.5 sm:p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors flex items-center justify-center shrink-0"
-            title="Quitter et revenir aux sujets"
-          >
-            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-          </button>
+          {(!!evaluation || userRole === 'super_admin') && (
+            <button 
+              onClick={onExit}
+              className="p-1.5 sm:p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors flex items-center justify-center shrink-0 cursor-pointer"
+              title="Quitter et revenir aux sujets"
+            >
+              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
+          )}
           <h1 className="text-sm sm:text-base md:text-lg font-bold truncate max-w-[140px] sm:max-w-xs md:max-w-md">{exercise.title}</h1>
           <span className="hidden sm:inline-block px-2.5 py-0.5 text-[10px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded-full shrink-0 border border-gray-200 dark:border-gray-700">
             {exercise.type}

@@ -692,6 +692,7 @@ function App() {
               setIsTimerRunning={setIsTimerRunning}
               teachers={teachers}
               user={user}
+              userRole={userProfile?.role}
               lastTeacherId={userProfile?.lastTeacherId}
             />
           </div>
