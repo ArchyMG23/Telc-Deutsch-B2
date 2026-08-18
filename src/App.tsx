@@ -656,10 +656,9 @@ function App() {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 min-h-0 overflow-y-auto bg-gray-50 dark:bg-gray-950 relative">
-        <div className="min-h-full">
-
-          {userProfile?.role === 'super_admin' && !isUploading && !selectedExercise ? (
+      <main className="flex-1 min-h-0 flex flex-col h-full w-full overflow-hidden bg-gray-50 dark:bg-gray-950 relative">
+        {userProfile?.role === 'super_admin' && !isUploading && !selectedExercise ? (
+          <div className="flex-1 min-h-0 overflow-y-auto w-full h-full">
             <SuperAdminDashboardView 
               exercises={exercises} 
               onUpload={handleUpload}
@@ -668,13 +667,17 @@ function App() {
               deleteExercise={deleteExercise}
               onSelectExercise={selectExercise}
             />
-          ) : userProfile?.role === 'admin' && !isUploading && !selectedExercise ? (
+          </div>
+        ) : userProfile?.role === 'admin' && !isUploading && !selectedExercise ? (
+          <div className="flex-1 min-h-0 overflow-y-auto w-full h-full">
             <AdminDashboardView />
-          ) : isUploading ? (
-            <div className="h-full flex items-center justify-center">
-              <UploadSection onUpload={handleUpload} isExtracting={isExtracting} isOnline={isOnline} />
-            </div>
-          ) : selectedExercise ? (
+          </div>
+        ) : isUploading ? (
+          <div className="flex-1 min-h-0 overflow-y-auto w-full h-full flex items-center justify-center p-4">
+            <UploadSection onUpload={handleUpload} isExtracting={isExtracting} isOnline={isOnline} />
+          </div>
+        ) : selectedExercise ? (
+          <div className="flex-1 min-h-0 w-full h-full flex flex-col overflow-hidden">
             <TrainingInterface
               key={selectedExercise.id}
               exercise={selectedExercise}
@@ -685,84 +688,82 @@ function App() {
               isEvaluating={isEvaluating}
               onExit={() => selectExercise(null, false)}
               isOnline={isOnline}
-              
-              
               isTimerRunning={isTimerRunning}
               setIsTimerRunning={setIsTimerRunning}
               teachers={teachers}
               user={user}
               lastTeacherId={userProfile?.lastTeacherId}
             />
-          ) : (
-            <div className="p-4 sm:p-8 space-y-6 sm:space-y-8 max-w-5xl mx-auto pb-24">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white tracking-tight flex items-center gap-2">
-                    <BookOpen className="w-6 h-6 text-[#FF0000]" />
-                    Sujets d'entraînement ({exercises.length})
-                  </h2>
-                  <p className="text-sm text-gray-500 mt-1">Sélectionnez un sujet pour commencer l'épreuve de rédaction.</p>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <div className="relative flex-1 sm:flex-initial sm:w-64">
-                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input 
-                      type="text" 
-                      placeholder="Rechercher un sujet..." 
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-9 pr-4 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF0000] focus:border-transparent"
-                    />
-                  </div>
-                  <button 
-                    onClick={() => selectExercise(null, true)}
-                    className="p-2 sm:px-4 sm:py-2 bg-[#FF0000] hover:bg-red-650 text-white rounded-lg font-bold text-sm transition-colors flex items-center gap-2 shadow-sm shrink-0"
-                  >
-                    <Upload className="w-4 h-4" />
-                    <span className="hidden sm:inline">Nouveau sujet</span>
-                  </button>
-                </div>
+          </div>
+        ) : (
+          <div className="flex-1 min-h-0 overflow-y-auto w-full h-full p-4 sm:p-8 space-y-6 sm:space-y-8 max-w-5xl mx-auto pb-24">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white tracking-tight flex items-center gap-2">
+                  <BookOpen className="w-6 h-6 text-[#FF0000]" />
+                  Sujets d'entraînement ({exercises.length})
+                </h2>
+                <p className="text-sm text-gray-500 mt-1">Sélectionnez un sujet pour commencer l'épreuve de rédaction.</p>
               </div>
-
-              <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                {filteredExercises.map((ex) => (
-                  <div 
-                    key={ex.id}
-                    onClick={() => selectExercise(ex.id)}
-                    className="group bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 sm:p-5 hover:border-[#FF0000] hover:shadow-md transition-all cursor-pointer flex flex-col h-[180px]"
-                  >
-                    <div className="flex justify-between items-start mb-3">
-                      <span className="px-2.5 py-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs font-bold rounded-md capitalize">
-                        {ex.type}
-                      </span>
-                      {progress[ex.id]?.evaluation && (
-                        <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-md">
-                          <CheckCircle className="w-3 h-3" /> Terminé
-                        </span>
-                      )}
-                    </div>
-                    
-                    <h3 className="font-bold text-gray-900 dark:text-white line-clamp-2 leading-tight group-hover:text-[#FF0000] transition-colors mb-2">
-                      {ex.title}
-                    </h3>
-                    
-                    <div className="mt-auto flex items-center justify-between text-xs text-gray-500">
-                      <span>B2 Telc Niveau</span>
-                      <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform text-[#FF0000]" />
-                    </div>
-                  </div>
-                ))}
-                
-                {filteredExercises.length === 0 && (
-                  <div className="col-span-full py-12 text-center border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-2xl bg-white/50 dark:bg-gray-900/50">
-                    <p className="text-gray-500 dark:text-gray-400 font-medium">Aucun sujet trouvé.</p>
-                  </div>
-                )}
+              
+              <div className="flex items-center gap-2">
+                <div className="relative flex-1 sm:flex-initial sm:w-64">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input 
+                    type="text" 
+                    placeholder="Rechercher un sujet..." 
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF0000] focus:border-transparent"
+                  />
+                </div>
+                <button 
+                  onClick={() => selectExercise(null, true)}
+                  className="p-2 sm:px-4 sm:py-2 bg-[#FF0000] hover:bg-red-650 text-white rounded-lg font-bold text-sm transition-colors flex items-center gap-2 shadow-sm shrink-0 cursor-pointer"
+                >
+                  <Upload className="w-4 h-4" />
+                  <span className="hidden sm:inline">Nouveau sujet</span>
+                </button>
               </div>
             </div>
-          )}
-        </div>
+
+            <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              {filteredExercises.map((ex) => (
+                <div 
+                  key={ex.id}
+                  onClick={() => selectExercise(ex.id)}
+                  className="group bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 sm:p-5 hover:border-[#FF0000] hover:shadow-md transition-all cursor-pointer flex flex-col h-[180px]"
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <span className="px-2.5 py-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs font-bold rounded-md capitalize">
+                      {ex.type}
+                    </span>
+                    {progress[ex.id]?.evaluation && (
+                      <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-md">
+                        <CheckCircle className="w-3 h-3" /> Terminé
+                      </span>
+                    )}
+                  </div>
+                  
+                  <h3 className="font-bold text-gray-900 dark:text-white line-clamp-2 leading-tight group-hover:text-[#FF0000] transition-colors mb-2">
+                    {ex.title}
+                  </h3>
+                  
+                  <div className="mt-auto flex items-center justify-between text-xs text-gray-500">
+                    <span>B2 Telc Niveau</span>
+                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform text-[#FF0000]" />
+                  </div>
+                </div>
+              ))}
+              
+              {filteredExercises.length === 0 && (
+                <div className="col-span-full py-12 text-center border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-2xl bg-white/50 dark:bg-gray-900/50">
+                  <p className="text-gray-500 dark:text-gray-400 font-medium">Aucun sujet trouvé.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </main>
 
       {/* Exercises Modal Overlay */}

@@ -30,11 +30,15 @@ export function TrainingInterface({
   const [text, setText] = useState(initialText);
   const [activeTab, setActiveTab] = useState<'topic' | 'write' | 'eval'>(evaluation ? 'eval' : 'write');
   const [isRedactionFinished, setIsRedactionFinished] = useState(false);
-  const { minutes, seconds, isActive, isWarning, isFinished, start, pause, reset } = useTimer(25);
+  const { minutes, seconds, isActive, isWarning, isUrgent, isFinished, start, pause, reset } = useTimer(30, true);
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
-  // The session counts as started if they already submitted, have written text, have an evaluation, or started manually
-  const [hasStartedSession, setHasStartedSession] = useState(!!evaluation || (!!initialText && initialText.trim().length > 0));
+  // Automatically start timer on mount if not evaluated
+  useEffect(() => {
+    if (!evaluation) {
+      start();
+    }
+  }, [evaluation, start]);
 
   const hasEndedRedaction = isFinished || isRedactionFinished || !!evaluation;
 
@@ -89,7 +93,7 @@ export function TrainingInterface({
   };
 
   const handleReset = () => {
-    reset();
+    reset(30);
     setIsRedactionFinished(false);
   };
 
@@ -134,51 +138,54 @@ export function TrainingInterface({
     }
   };
 
+  const wordCount = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+    <div className="flex flex-col h-full w-full min-h-0 flex-1 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 overflow-hidden">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-800 shrink-0 select-none">
+      <header className="flex items-center justify-between px-4 sm:px-6 py-2.5 sm:py-3.5 border-b border-gray-200 dark:border-gray-800 shrink-0 select-none bg-white dark:bg-gray-900 z-10 shadow-xs">
         <div className="flex items-center gap-2 sm:gap-4 min-w-0">
           <button 
             onClick={onExit}
             className="p-1.5 sm:p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors flex items-center justify-center shrink-0"
-            title="Quitter et abandonner l'exercice (perte des modifications)"
+            title="Quitter et revenir aux sujets"
           >
             <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
-          <h1 className="text-sm sm:text-base md:text-xl font-bold truncate max-w-[120px] sm:max-w-xs md:max-w-md">{exercise.title}</h1>
-          <span className="hidden sm:inline-block px-2.5 py-0.5 text-[10px] font-semibold bg-gray-100 dark:bg-gray-800 rounded-full shrink-0">
+          <h1 className="text-sm sm:text-base md:text-lg font-bold truncate max-w-[140px] sm:max-w-xs md:max-w-md">{exercise.title}</h1>
+          <span className="hidden sm:inline-block px-2.5 py-0.5 text-[10px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded-full shrink-0 border border-gray-200 dark:border-gray-700">
             {exercise.type}
           </span>
         </div>
 
-        {/* Timer Module */}
-        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+        {/* Timer Module & Controls */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {!evaluation && (
             <>
-              {hasStartedSession && (
-                <div className={cn(
-                  "flex items-center gap-1.5 px-2 py-1 sm:px-4 sm:py-2 rounded-lg font-mono text-sm sm:text-lg md:text-xl font-bold transition-colors select-none",
-                  isWarning ? "bg-[#FF0000]/10 text-[#FF0000]" : "bg-gray-100 dark:bg-gray-800",
-                  isFinished && "bg-red-500 text-white"
-                )}>
-                  <Clock className="w-4 h-4 text-gray-400 select-none animate-pulse" />
-                  <span>{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}</span>
-                </div>
-              )}
+              {/* Countdown Timer with warning colors */}
+              <div className={cn(
+                "flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl font-mono text-sm sm:text-base md:text-lg font-bold transition-all select-none border",
+                isFinished ? "bg-red-600 text-white border-red-700 shadow-md shadow-red-500/20" :
+                isUrgent ? "bg-red-600 text-white border-red-500 animate-pulse shadow-md shadow-red-500/30 font-black" :
+                isWarning ? "bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 border-red-300 dark:border-red-800/60 animate-pulse" :
+                "bg-gray-100 dark:bg-gray-800/90 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700"
+              )}>
+                <Clock className={cn("w-4 h-4", isFinished || isUrgent ? "text-white" : isWarning ? "text-red-500 animate-spin" : "text-gray-400")} />
+                <span>{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}</span>
+              </div>
 
-              {hasStartedSession && !hasEndedRedaction && (
+              {!hasEndedRedaction && (
                 <button
                   onClick={() => {
-                    if (confirm("Voulez-vous arrêter le minuteur et valider votre rédaction ? Vous pourrez ensuite demander une correction IA ou l'envoyer à un enseignant.")) {
+                    if (confirm("Voulez-vous valider votre rédaction ? Vous pourrez ensuite demander une correction IA ou l'envoyer à un enseignant.")) {
                       pause();
                       setIsRedactionFinished(true);
                     }
                   }}
                   disabled={text.trim().length === 0}
-                  className="px-2.5 py-1.5 sm:px-4 sm:py-2 bg-[#FF0000] hover:bg-red-650 disabled:opacity-50 text-white font-bold rounded-lg text-xs transition-colors shadow-sm shadow-red-500/10 flex items-center gap-1"
+                  className="px-3 py-1.5 sm:px-4 sm:py-2 bg-[#FF0000] hover:bg-red-650 disabled:opacity-50 text-white font-bold rounded-xl text-xs sm:text-sm transition-all shadow-sm shadow-red-500/10 flex items-center gap-1.5 cursor-pointer active:scale-95"
                 >
-                  <CheckCircle className="w-3.5 h-3.5" />
+                  <CheckCircle className="w-4 h-4" />
                   <span className="hidden sm:inline">Terminer la rédaction</span>
                   <span className="inline sm:hidden">Terminer</span>
                 </button>
@@ -190,7 +197,7 @@ export function TrainingInterface({
             <div className="flex items-center gap-1.5 sm:gap-2">
                <button 
                 onClick={handlePrint}
-                className="p-1.5 sm:p-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors shrink-0"
+                className="p-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition-colors shrink-0"
                 title="Imprimer pour correction manuelle"
               >
                 <Printer className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -200,7 +207,7 @@ export function TrainingInterface({
               <div className="relative group">
                 <button 
                   disabled={isSubmitting || teachers.length === 0}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-4 sm:py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs sm:text-sm font-medium rounded-lg transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs sm:text-sm font-medium rounded-xl transition-colors"
                 >
                   <UserCircle className="w-4 h-4" />
                   <span className="hidden sm:inline">Enseignant</span>
@@ -230,7 +237,7 @@ export function TrainingInterface({
                <button
                 onClick={handleEvaluate}
                 disabled={text.trim().length === 0 || isEvaluating || !isOnline}
-                className="flex items-center gap-1.5 px-3 py-1.5 sm:px-6 sm:py-2 bg-[#FF0000] hover:bg-red-700 disabled:opacity-50 text-white text-xs sm:text-sm font-medium rounded-lg transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 sm:px-5 sm:py-2 bg-[#FF0000] hover:bg-red-700 disabled:opacity-50 text-white text-xs sm:text-sm font-bold rounded-xl transition-colors shadow-sm"
               >
                 {isEvaluating ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <CheckCircle className="w-4 h-4" />}
                 <span className="hidden sm:inline">Correction IA</span>
@@ -239,31 +246,93 @@ export function TrainingInterface({
             </div>
           ) : (
             isActive && (
-              <p className="hidden sm:block text-[10px] text-orange-500 font-bold uppercase animate-pulse">En cours...</p>
+              <p className="hidden md:block text-[10px] text-orange-500 font-bold uppercase tracking-wider animate-pulse">En cours...</p>
             )
           )}
         </div>
       </header>
 
+      {/* Persistent Mobile Tab Navigation Bar */}
+      {!evaluation ? (
+        <div className="md:hidden flex border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shrink-0 z-10">
+          <button
+            onClick={() => setActiveTab('topic')}
+            className={cn(
+              "flex-1 py-3 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 border-b-2 transition-colors cursor-pointer",
+              activeTab === 'topic' ? "border-[#FF0000] text-[#FF0000]" : "border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-600"
+            )}
+          >
+            Sujet
+          </button>
+          <button
+            onClick={() => setActiveTab('write')}
+            className={cn(
+              "flex-1 py-3 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 border-b-2 transition-colors cursor-pointer",
+              activeTab === 'write' ? "border-[#FF0000] text-[#FF0000]" : "border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-600"
+            )}
+          >
+            Ma Rédaction
+          </button>
+        </div>
+      ) : (
+        <div className="md:hidden flex border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shrink-0 z-10">
+          <button
+            onClick={() => setActiveTab('topic')}
+            className={cn(
+              "flex-1 py-3 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 border-b-2 transition-colors cursor-pointer",
+              activeTab === 'topic' ? "border-[#FF0000] text-[#FF0000]" : "border-transparent text-gray-400 dark:text-gray-500"
+            )}
+          >
+            Sujet
+          </button>
+          <button
+            onClick={() => setActiveTab('write')}
+            className={cn(
+              "flex-1 py-3 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 border-b-2 transition-colors cursor-pointer",
+              activeTab === 'write' ? "border-[#FF0000] text-[#FF0000]" : "border-transparent text-gray-400 dark:text-gray-500"
+            )}
+          >
+            <PenTool className="w-3.5 h-3.5" />
+            Rédaction
+          </button>
+          <button
+            onClick={() => setActiveTab('eval')}
+            className={cn(
+              "flex-1 py-3 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 border-b-2 transition-colors cursor-pointer",
+              activeTab === 'eval' ? "border-[#FF0000] text-[#FF0000]" : "border-transparent text-gray-400 dark:text-gray-500"
+            )}
+          >
+            <Award className="w-3.5 h-3.5" />
+            Correction ({evaluation.score}/45)
+          </button>
+        </div>
+      )}
+
       {/* Split Screen Content */}
-      <main className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-0">
+      <main className="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden w-full h-full">
         {/* Left Column: Topic (Situation and Consigne) */}
         <div className={cn(
-          "w-full md:w-1/2 h-full overflow-y-auto p-4 sm:p-8 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50",
-          activeTab === 'topic' ? "block" : "hidden md:block"
+          "w-full md:w-1/2 h-full min-h-0 flex flex-col overflow-y-auto p-4 sm:p-6 md:p-8 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-900/40",
+          activeTab === 'topic' ? "flex" : "hidden md:flex"
         )}>
           <div className="mb-6 sm:mb-8">
-            <h2 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Situation / Offre</h2>
-            <div className="p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-              <div className="prose dark:prose-invert max-w-none whitespace-pre-wrap text-[15px] sm:text-[17px] leading-relaxed text-gray-800 dark:text-gray-200">
+            <h2 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#FF0000]" />
+              Situation / Offre
+            </h2>
+            <div className="p-4 sm:p-6 bg-white dark:bg-gray-800/90 rounded-2xl border border-gray-200/80 dark:border-gray-700/80 shadow-xs">
+              <div className="prose dark:prose-invert max-w-none whitespace-pre-wrap text-[15px] sm:text-base leading-relaxed text-gray-800 dark:text-gray-200">
                 {exercise.situation}
               </div>
             </div>
           </div>
 
           <div>
-            <h2 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Consigne (Aufgabe)</h2>
-            <div className="prose dark:prose-invert max-w-none whitespace-pre-wrap text-[15px] sm:text-[17px] leading-relaxed text-gray-800 dark:text-gray-200 bg-white/40 dark:bg-gray-800/10 p-4 rounded-xl border border-dashed border-gray-200 dark:border-gray-800">
+            <h2 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-indigo-500" />
+              Consigne (Aufgabe)
+            </h2>
+            <div className="prose dark:prose-invert max-w-none whitespace-pre-wrap text-[15px] sm:text-base leading-relaxed text-gray-800 dark:text-gray-200 bg-white/60 dark:bg-gray-800/30 p-4 sm:p-6 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
               {exercise.content}
             </div>
           </div>
@@ -271,49 +340,16 @@ export function TrainingInterface({
 
         {/* Right Column: Writing Area & Evaluation */}
         <div className={cn(
-          "w-full md:w-1/2 h-full flex flex-col bg-white dark:bg-gray-950 min-h-0",
+          "w-full md:w-1/2 h-full min-h-0 flex flex-col bg-white dark:bg-gray-950 overflow-hidden",
           activeTab === 'topic' ? "hidden md:flex" : "flex"
         )}>
-          {/* Mobile-only tab bar when no evaluation */}
-          {!evaluation && (
-            <div className="md:hidden flex border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 shrink-0">
-              <button
-                onClick={() => setActiveTab('topic')}
-                className={cn(
-                  "flex-1 py-3 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 border-b-2 transition-colors",
-                  activeTab === 'topic' ? "border-[#FF0000] text-[#FF0000]" : "border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-600"
-                )}
-              >
-                Sujet
-              </button>
-              <button
-                onClick={() => setActiveTab('write')}
-                className={cn(
-                  "flex-1 py-3 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 border-b-2 transition-colors",
-                  activeTab === 'write' ? "border-[#FF0000] text-[#FF0000]" : "border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-600"
-                )}
-              >
-                Ma Rédaction
-              </button>
-            </div>
-          )}
-
-          {/* Tabs */}
+          {/* Desktop Tabs when evaluated */}
           {evaluation && (
-            <div className="flex border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 shrink-0">
-              <button
-                onClick={() => setActiveTab('topic')}
-                className={cn(
-                  "md:hidden flex-1 py-3 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 border-b-2 transition-colors",
-                  activeTab === 'topic' ? "border-[#FF0000] text-[#FF0000]" : "border-transparent text-gray-400 dark:text-gray-500"
-                )}
-              >
-                Sujet
-              </button>
+            <div className="hidden md:flex border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 shrink-0">
               <button
                 onClick={() => setActiveTab('write')}
                 className={cn(
-                  "flex-1 py-3 text-xs sm:text-sm font-medium flex items-center justify-center gap-2 border-b-2 transition-colors",
+                  "flex-1 py-3 text-xs sm:text-sm font-medium flex items-center justify-center gap-2 border-b-2 transition-colors cursor-pointer",
                   activeTab === 'write' ? "border-[#FF0000] text-[#FF0000]" : "border-transparent text-gray-500 hover:text-gray-900 dark:hover:text-gray-100"
                 )}
               >
@@ -323,7 +359,7 @@ export function TrainingInterface({
               <button
                 onClick={() => setActiveTab('eval')}
                 className={cn(
-                  "flex-1 py-3 text-xs sm:text-sm font-medium flex items-center justify-center gap-2 border-b-2 transition-colors",
+                  "flex-1 py-3 text-xs sm:text-sm font-medium flex items-center justify-center gap-2 border-b-2 transition-colors cursor-pointer",
                   activeTab === 'eval' ? "border-[#FF0000] text-[#FF0000]" : "border-transparent text-gray-500 hover:text-gray-900 dark:hover:text-gray-100"
                 )}
               >
@@ -334,102 +370,86 @@ export function TrainingInterface({
           )}
 
           {activeTab === 'write' || activeTab === 'topic' ? (
-            <div className="relative flex-1 flex flex-col min-h-0">
-              {!hasStartedSession && !evaluation ? (
-                <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8 text-center bg-gray-50/30 dark:bg-gray-950/20 select-none overflow-y-auto">
-                  <div className="max-w-md w-full p-6 sm:p-8 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xl space-y-6">
-                    <div className="w-16 h-16 bg-[#FF0000]/10 text-[#FF0000] rounded-full flex items-center justify-center mx-auto">
-                      <Clock className="w-8 h-8 animate-pulse" />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">Prêt à commencer l'exercice ?</h3>
-                      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 leading-normal">
-                        Vous disposez de <strong className="text-gray-800 dark:text-gray-200">25 minutes</strong> pour rédiger votre lettre d'examen.
-                      </p>
-                    </div>
+            <div className="relative flex-1 min-h-0 flex flex-col w-full h-full overflow-hidden">
+              <textarea
+                ref={textareaRef}
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                disabled={hasEndedRedaction && !evaluation}
+                placeholder="Sehr geehrte Damen und Herren, ..."
+                className={cn(
+                  "flex-1 min-h-0 w-full p-4 sm:p-6 md:p-8 resize-none outline-none bg-transparent text-[15px] sm:text-base md:text-lg leading-relaxed placeholder:text-gray-400 dark:placeholder:text-gray-600 transition-opacity font-normal overflow-y-auto",
+                  hasEndedRedaction && !evaluation && "opacity-50 grayscale cursor-not-allowed"
+                )}
+                spellCheck={false}
+                autoFocus
+              />
 
-                    <div className="p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30 rounded-xl text-left space-y-2">
-                      <h4 className="text-[10px] font-bold text-amber-600 dark:text-amber-500 uppercase tracking-wider">⚠️ Consignes de sécurité du minuteur :</h4>
-                      <ul className="text-xs text-amber-800 dark:text-amber-400 list-disc list-inside space-y-1 leading-normal">
-                        <li>Le minuteur tourne en continu. Pas de pause ou de réinitialisation.</li>
-                        <li><strong>Si vous fermez ou rechargez l'application, votre texte sera perdu.</strong></li>
-                        <li>Écrivez directement dans la zone de saisie après le lancement.</li>
-                      </ul>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setHasStartedSession(true);
-                        start();
-                      }}
-                      className="w-full py-3 px-5 bg-[#FF0000] hover:bg-red-650 text-white font-bold rounded-xl transition-all active:scale-95 shadow-lg shadow-red-500/10 text-xs sm:text-sm cursor-pointer"
-                    >
-                      Démarrer le minuteur & Commencer
-                    </button>
+              {hasEndedRedaction && !evaluation && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[2px] pointer-events-none p-4 w-full z-20">
+                  <div className="bg-gray-900 text-white border border-gray-700 px-6 py-5 rounded-2xl shadow-2xl font-bold flex flex-col items-center gap-3 text-center max-w-sm pointer-events-auto">
+                    {isFinished ? (
+                      <>
+                        <div className="w-12 h-12 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center">
+                          <Clock className="w-6 h-6 animate-pulse" />
+                        </div>
+                        <span className="text-lg">Temps écoulé (30 min) !</span>
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                          <CheckCircle className="w-6 h-6" />
+                        </div>
+                        <span className="text-lg">Rédaction validée !</span>
+                      </>
+                    )}
+                    <p className="text-xs text-gray-300 font-normal">Cliquez sur « Correction IA » ou « Enseignant » en haut pour obtenir votre évaluation détaillée.</p>
                   </div>
                 </div>
-              ) : (
-                <>
-                  <textarea
-                    ref={textareaRef}
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    disabled={hasEndedRedaction && !evaluation}
-                    placeholder="Sehr geehrte Damen und Herren, ..."
-                    className={cn(
-                      "flex-1 w-full p-4 sm:p-8 resize-none outline-none bg-transparent text-[15px] sm:text-lg leading-relaxed placeholder:text-gray-400 dark:placeholder:text-gray-600 transition-opacity",
-                      hasEndedRedaction && !evaluation && "opacity-50 grayscale cursor-not-allowed"
-                    )}
-                    spellCheck={false}
-                  />
-                  {hasEndedRedaction && !evaluation && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-white/10 backdrop-blur-[1px] pointer-events-none p-4 w-full">
-                      <div className="bg-red-500 text-white px-6 py-4 rounded-2xl shadow-2xl font-bold flex flex-col items-center gap-2 text-center max-w-sm pointer-events-auto">
-                        {isFinished ? (
-                          <>
-                            <Clock className="w-8 h-8 animate-pulse" />
-                            <span>Temps écoulé !</span>
-                          </>
-                        ) : (
-                          <>
-                            <CheckCircle className="w-8 h-8" />
-                            <span>Rédaction validée !</span>
-                          </>
-                        )}
-                        <p className="text-xs font-normal opacity-90">Choisissez une option de correction ci-dessus.</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* German Special Characters helper panel */}
-                  {!hasEndedRedaction && (
-                    <div className="px-4 sm:px-8 py-2 border-t border-gray-100 dark:border-gray-900 bg-gray-50/50 dark:bg-gray-900/10 flex items-center gap-1.5 flex-wrap shrink-0">
-                      <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mr-1.5 select-none">Caractères Allemands :</span>
-                      {['ä', 'ö', 'ü', 'ß', 'Ä', 'Ö', 'Ü'].map(char => (
-                        <button
-                          key={char}
-                          type="button"
-                          onClick={() => insertSpecialChar(char)}
-                          className="w-8 h-8 sm:w-9 sm:h-9 text-sm sm:text-base font-semibold bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-extralight border-gray-200 dark:border-gray-700 rounded-lg shadow-sm active:scale-95 transition-all text-gray-800 dark:text-gray-200 flex items-center justify-center shrink-0"
-                          title={`Insérer ${char}`}
-                        >
-                          {char}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  <div className="px-4 sm:px-8 py-3 border-t border-gray-150 dark:border-gray-900 text-[10px] uppercase font-bold text-gray-400 flex justify-between shrink-0 select-none">
-                    <span>{text.trim().split(/\s+/).filter(w => w.length > 0).length} mots</span>
-                    <span>Telc B2 (150-200 mots)</span>
-                  </div>
-                </>
               )}
+
+              {/* German Special Characters helper panel */}
+              {!hasEndedRedaction && (
+                <div className="px-4 sm:px-6 py-2 border-t border-gray-200 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-900/50 flex items-center justify-between gap-2 flex-wrap shrink-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mr-1 select-none">
+                      Caractères Allemands :
+                    </span>
+                    {['ä', 'ö', 'ü', 'ß', 'Ä', 'Ö', 'Ü'].map(char => (
+                      <button
+                        key={char}
+                        type="button"
+                        onClick={() => insertSpecialChar(char)}
+                        className="w-8 h-8 sm:w-9 sm:h-9 text-sm sm:text-base font-semibold bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg shadow-2xs active:scale-95 transition-all text-gray-800 dark:text-gray-200 flex items-center justify-center shrink-0 cursor-pointer"
+                        title={`Insérer ${char}`}
+                      >
+                        {char}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Autosave status indicator */}
+                  <div className="flex items-center gap-1.5 text-[11px] text-gray-400 dark:text-gray-500 font-medium select-none">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="hidden sm:inline">Sauvegarde auto</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Word Count Footer */}
+              <div className="px-4 sm:px-6 py-2.5 border-t border-gray-200 dark:border-gray-800 text-xs font-semibold text-gray-500 dark:text-gray-400 flex items-center justify-between bg-white dark:bg-gray-950 shrink-0 select-none">
+                <span className={cn(
+                  "font-mono font-bold text-xs sm:text-sm",
+                  wordCount >= 150 && wordCount <= 200 ? "text-emerald-600 dark:text-emerald-400" :
+                  wordCount > 200 ? "text-amber-600 dark:text-amber-400" : "text-gray-700 dark:text-gray-300"
+                )}>
+                  {wordCount} mots
+                </span>
+                <span className="text-[11px] text-gray-400 font-normal">Objectif Telc B2 : 150 – 200 mots</span>
+              </div>
             </div>
           ) : (
-            <div className="flex-1 overflow-y-auto p-4 sm:p-8">
+            <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-8">
               {evaluation && (
                 <div className="space-y-6 sm:space-y-8">
                    <div className="text-center mb-6 sm:mb-10">
