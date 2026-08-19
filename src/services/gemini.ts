@@ -54,7 +54,7 @@ export async function extractExercises(fileData: string, mimeType: string): Prom
 
   try {
     const response = await getAiClient().models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.7-flash',
       contents: {
         parts: [
           {
@@ -116,53 +116,78 @@ export async function extractExercises(fileData: string, mimeType: string): Prom
 }
 
 export async function evaluateWriting(exercise: Exercise, userText: string): Promise<Evaluation> {
-  const prompt = `
-    Tu es un correcteur expert certifié telc Deutsch B2.
-    Tu dois évaluer la lettre formelle suivante selon la grille officielle telc B2 Schriftlicher Ausdruck (45 points au total).
-    
-    Situation / Offre :
-    """
-    ${exercise.situation}
-    """
-    
-    Consigne de l'exercice :
-    """
-    ${exercise.content}
-    """
-    
-    Rédaction de l'étudiant :
-    """
-    ${userText}
-    """
-    
-    Fournis une évaluation détaillée en français, structurée selon les critères du Telc B2 :
-    1. Aufgabenbewältigung (Inhalt) : /15 pts (Max 5 points x multiplier 3). Évalue si les points de la consigne sont traités.
-    2. Kommunikative Gestaltung (Structure & communication) : /15 pts (Max 5 points x multiplier 3). Structure formelle, registre, éléments obligatoires, cohérence.
-    3. Korrektheit (Correction linguistique) : /15 pts (Max 5 points x multiplier 3). Grammaire, orthographe, vocabulaire.
-    4. Feedback global et conseils.
-    5. Fournis UNE VERSION ENTIÈREMENT CORRIGÉE de la rédaction.
+  const systemInstruction = `Tu es un examinateur et correcteur officiel expert certifié telc Deutsch B2 (épreuve Schriftlicher Ausdruck).
+Tu évalues avec une rigueur absolue, fidélité et précision la rédaction de l'étudiant selon les critères officiels du barème telc B2 (45 points au total).
 
-    IMPORTANT: Retourne UNIQUEMENT un objet JSON valide correspondant au schéma demandé.
+CRITÈRES OFFICIELS TELC B2 :
+1. Aufgabenbewältigung (Inhaltliche Angemessenheit) : Note sur 15 points
+   - Évalue si les 4 Leitpunkte (points de consigne) sont tous traités de manière développée et pertinente.
+   - Traitement complet et approfondi = 15/15 (A), satisfaisant = 12/15 (B), partiel = 9/15 (C), insuffisant = 3/15 (D), non traité = 0/15 (E).
+
+2. Kommunikative Gestaltung (Textaufbau, Kohärenz, Formale Vorgaben) : Note sur 15 points
+   - Respect de la typologie textuelle formelle allemande (Betreffzeile, formule d'appel adéquate comme "Sehr geehrte Damen und Herren," formule de politesse finale "Mit freundlichen Grüßen", Unterschrift).
+   - Articulation logique, transitions et connecteurs (deshalb, trotzdem, außerdem, da, usw.).
+
+3. Korrektheit (Morphosyntax, Grammatik, Rechtschreibung & Zeichensetzung) : Note sur 15 points
+   - Syntaxe (ordre des mots, verbe en 2e position ou en fin de subordonnée).
+   - Déclinaisons (cas Nominativ, Akkusativ, Dativ, Genitiv, adjectifs).
+   - Orthographe et ponctuation.
+
+RÈGLES CAPITALES ANTI-HALLUCINATIONS (TRÈS STRICTES) :
+1. VÉRIFICATION LITÉRALE DE LA CASSE (Majuscules / Minuscules - Groß- und Kleinschreibung) :
+   - Vérifie CARACTÈRE PAR CARACTÈRE le texte RÉELLEMENT écrit par l'étudiant.
+   - Si un nom ou un début de phrase commence DÉJÀ par une lettre majuscule dans le texte de l'étudiant (par exemple "Reise", "Urlaub", "Hotel", "Beschwerde", "Damen", "Herren"), il est STRICTEMENT INTERDIT de lui reprocher une absence de majuscule.
+   - Ne signale une erreur de majuscule QUE si le mot a été littéralement et explicitement saisi en minuscule (ex: "mein urlaub" au lieu de "mein Urlaub").
+
+2. VÉRIFICATION STRICTE DE L'ORTHOGRAPHE :
+   - Ne signale JAMAIS de fausses fautes d'orthographe sur des mots correctement orthographiés en allemand standard (Duden).
+   - Ne jamais halluciner de fautes qui n'existent pas dans le texte de l'étudiant.
+   - Pour chaque erreur relevée dans la rubrique 'Korrektheit', cite textuellement l'extrait de l'étudiant entre guillemets, donne la correction exacte et explique la règle en français.
+
+3. PROPOSITION DE CORRECTION COMPLÈTE ('correctedText') :
+   - Fournis une lettre modèle de niveau B2 parfaite, fluide, sans aucune faute, respectant scrupuleusement la structure formelle et les 4 points de la consigne.
+
+IMPORTANT:
+- La note globale 'score' DOIT être la somme exacte des trois notes : inhaltScore + strukturScore + spracheScore (maximum 45).
+- Fournis les explications et commentaires en français bienveillant et constructif.`;
+
+  const userPrompt = `
+Voici le sujet et la rédaction de l'étudiant à évaluer :
+
+=== SITUATION / OFFRE ORIGINALE ===
+${exercise.situation}
+
+=== CONSIGNE DE L'EXERCICE (POINTS À TRAITER) ===
+${exercise.content}
+
+=== RÉDACTION RÉELLE DE L'ÉTUDIANT (Vérifier mot à mot la casse et l'orthographe exacte) ===
+"""
+${userText}
+"""
+
+Évalue ce texte avec la plus grande précision selon les instructions système. Retourne uniquement l'objet JSON formaté selon le schéma.
 `;
 
   try {
     const response = await getAiClient().models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: [{ parts: [{ text: prompt }] }],
+      model: 'gemini-3.7-flash',
+      contents: [{ parts: [{ text: userPrompt }] }],
       config: {
+        systemInstruction: systemInstruction,
+        temperature: 0.2,
         responseMimeType: 'application/json',
         responseSchema: {
           type: Type.OBJECT,
           properties: {
-            score: { type: Type.NUMBER, description: "Note globale sur 45" },
-            inhalt: { type: Type.STRING, description: "Feedback détaillé Aufgabenbewältigung" },
-            inhaltScore: { type: Type.NUMBER, description: "Note Aufgabenbewältigung /15" },
-            struktur: { type: Type.STRING, description: "Feedback détaillé Kommunikative Gestaltung" },
-            strukturScore: { type: Type.NUMBER, description: "Note Kommunikative Gestaltung /15" },
-            sprache: { type: Type.STRING, description: "Feedback détaillé Korrektheit" },
-            spracheScore: { type: Type.NUMBER, description: "Note Korrektheit /15" },
-            overallFeedback: { type: Type.STRING, description: "Synthèse globale et conseils" },
-            correctedText: { type: Type.STRING, description: "Le texte entièrement corrigé" },
+            score: { type: Type.NUMBER, description: "Note globale sur 45 (inhaltScore + strukturScore + spracheScore)" },
+            inhalt: { type: Type.STRING, description: "Commentaire détaillé Aufgabenbewältigung en Markdown (évaluation des 4 points)" },
+            inhaltScore: { type: Type.NUMBER, description: "Note Aufgabenbewältigung sur 15 (0, 3, 9, 12 ou 15)" },
+            struktur: { type: Type.STRING, description: "Commentaire détaillé Kommunikative Gestaltung en Markdown" },
+            strukturScore: { type: Type.NUMBER, description: "Note Kommunikative Gestaltung sur 15" },
+            sprache: { type: Type.STRING, description: "Commentaire détaillé Korrektheit en Markdown (citations exactes des erreurs réelles)" },
+            spracheScore: { type: Type.NUMBER, description: "Note Korrektheit sur 15" },
+            overallFeedback: { type: Type.STRING, description: "Synthèse globale, points forts et conseils clés pour le B2" },
+            correctedText: { type: Type.STRING, description: "La lettre modèle B2 entièrement corrigée et rédigée" },
           },
           required: [
             "score", "inhalt", "inhaltScore", "struktur", "strukturScore", 
