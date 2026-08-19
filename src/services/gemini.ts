@@ -54,7 +54,7 @@ export async function extractExercises(fileData: string, mimeType: string): Prom
 
   try {
     const response = await getAiClient().models.generateContent({
-      model: 'gemini-3.7-flash',
+      model: 'gemini-2.5-flash',
       contents: {
         parts: [
           {
@@ -109,6 +109,9 @@ export async function extractExercises(fileData: string, mimeType: string): Prom
     }
     if (e.message?.includes("inlineData")) {
        throw new Error("Le format du fichier n'est pas supporté ou est trop volumineux pour l'IA.");
+    }
+    if (e.message?.includes("503") || e.message?.includes("high demand") || e.message?.includes("UNAVAILABLE")) {
+      throw new Error("L'IA est actuellement surchargée (forte demande). Veuillez patienter quelques minutes et réessayer.");
     }
     
     throw new Error(e.message || "Erreur lors de l'extraction des sujets.");
@@ -170,7 +173,7 @@ ${userText}
 
   try {
     const response = await getAiClient().models.generateContent({
-      model: 'gemini-3.7-flash',
+      model: 'gemini-2.5-flash',
       contents: [{ parts: [{ text: userPrompt }] }],
       config: {
         systemInstruction: systemInstruction,
@@ -223,6 +226,9 @@ ${userText}
     }
     if (e.message?.includes("safety") || e.message?.includes("blocked")) {
       throw new Error("Le contenu a été bloqué par les filtres de sécurité de l'IA. Essayez de reformuler votre texte.");
+    }
+    if (e.message?.includes("503") || e.message?.includes("high demand") || e.message?.includes("UNAVAILABLE")) {
+      throw new Error("L'IA est actuellement surchargée (forte demande). Veuillez patienter quelques minutes et réessayer.");
     }
     
     throw new Error(e.message || "Erreur lors de la communication avec l'IA.");
